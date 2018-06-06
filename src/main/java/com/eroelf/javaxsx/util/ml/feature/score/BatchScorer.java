@@ -10,7 +10,7 @@ import com.eroelf.javaxsx.util.ml.feature.BatchScoreableRestrictedBatchSample;
  * 
  * @author weikun.zhong
  *
- * @see {@link BatchScoreableRestrictedBatchSample}
+ * @see BatchScoreableRestrictedBatchSample
  */
 public abstract class BatchScorer implements Scorer
 {

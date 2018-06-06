@@ -114,8 +114,8 @@ public final class GroupingUpdater
 	/**
 	 * Update {@link GroupingUtil} information immediately, and schedule an update task at a fixed rate.
 	 * 
-	 * @param period @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
-	 * @param timeUnit @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param period the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param timeUnit the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
 	 * @param needDelete if {@code true}, any {@link Facet} instance that already exits in the {@link GroupingUtil} but does NOT present in the database query result will be removed, otherwise not.
 	 * @param useRegex if {@code true}, {@code facetNames} should have length 1 and the only element will be considered as a regular expression, otherwise all {@code facetNames} are considered as the exact facet names.
 	 * @param facetNames facets that to be updated. If not supply, updates all facets queried from the database.
@@ -129,9 +129,9 @@ public final class GroupingUpdater
 	 * Update {@link GroupingUtil} information after a specified {@code initialDelay}, and schedule an update task at fixed rate.
 	 * Logs will be printed to stderr.
 	 * 
-	 * @param initialDelay @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
-	 * @param period @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
-	 * @param timeUnit @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param initialDelay the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param period the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param timeUnit the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
 	 * @param needDelete if {@code true}, any {@link Facet} instance that already exits in the {@link GroupingUtil} but does NOT present in the database query result will be removed, otherwise not.
 	 * @param useRegex if {@code true}, {@code facetNames} should have length 1 and the only element will be considered as a regular expression, otherwise all {@code facetNames} are considered as the exact facet names.
 	 * @param facetNames facets that to be updated. If not supply, updates all facets queried from the database.
@@ -145,9 +145,9 @@ public final class GroupingUpdater
 	 * Update {@link GroupingUtil} information after a specified {@code initialDelay}, and schedule an update task at fixed rate.
 	 * 
 	 * @param loggerFunc a {@link BiConsumer} instance to process {@link Exception}s and error messages.
-	 * @param initialDelay @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
-	 * @param period @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
-	 * @param timeUnit @see {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param initialDelay the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param period the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
+	 * @param timeUnit the same as it defined at {@link ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)}
 	 * @param needDelete if {@code true}, any {@link Facet} instance that already exits in the {@link GroupingUtil} but does NOT present in the database query result will be removed, otherwise not.
 	 * @param useRegex if {@code true}, {@code facetNames} should have length 1 and the only element will be considered as a regular expression, otherwise all {@code facetNames} are considered as the exact facet names.
 	 * @param facetNames facets that to be updated. If not supply, updates all facets queried from the database.
@@ -179,9 +179,9 @@ public final class GroupingUpdater
 	/**
 	 * Stop the scheduled update task.
 	 * 
-	 * @see {@link #schedule(boolean, boolean, String...)}
-	 * @see {@link #schedule(long, TimeUnit, boolean, boolean, String...)}
-	 * @see {@link #schedule(long, long, TimeUnit, boolean, boolean, String...)}
+	 * @see #schedule(boolean, boolean, String...)
+	 * @see #schedule(long, TimeUnit, boolean, boolean, String...)
+	 * @see #schedule(long, long, TimeUnit, boolean, boolean, String...)
 	 */
 	public static void stop()
 	{

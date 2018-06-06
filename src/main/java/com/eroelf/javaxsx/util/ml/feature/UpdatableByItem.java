@@ -13,7 +13,7 @@ public interface UpdatableByItem<T extends Item>
 	 * Updates features of {@code this} object by the given {@code item} object.
 	 * Generally, features with the same feature indices in {@code this} object should be overwritten.
 	 * 
-	 * @param item
+	 * @param item the given object to be used to update {@code this} object.
 	 */
 	public void update(T item);
 }

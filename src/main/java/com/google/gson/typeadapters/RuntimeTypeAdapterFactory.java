@@ -181,6 +181,12 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 	 * Creates a new runtime type adapter using for {@code baseType} using
 	 * {@code typeFieldName} as the type field name. Type field names are case
 	 * sensitive.
+	 * 
+	 * @param <T> the base type
+	 * 
+	 * @param baseType baseType
+	 * @param typeFieldName typeFieldName
+	 * @return a {@link RuntimeTypeAdapterFactory} instance
 	 */
 	public static <T> RuntimeTypeAdapterFactory<T> of(Class<T> baseType, String typeFieldName)
 	{
@@ -190,6 +196,11 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 	/**
 	 * Creates a new runtime type adapter for {@code baseType} using
 	 * {@code "type"} as the type field name.
+	 * 
+	 * @param <T> the base type
+	 * 
+	 * @param baseType baseType
+	 * @return a {@link RuntimeTypeAdapterFactory} instance
 	 */
 	public static <T> RuntimeTypeAdapterFactory<T> of(Class<T> baseType)
 	{
@@ -199,6 +210,10 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 	/**
 	 * Registers {@code type} identified by {@code label}. Labels are case
 	 * sensitive.
+	 * 
+	 * @param type the sub-type
+	 * @param label the label
+	 * @return {@code this}
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if either {@code type} or {@code label} have already been
@@ -222,6 +237,9 @@ public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 	/**
 	 * Registers {@code type} identified by its {@link Class#getSimpleName
 	 * simple name}. Labels are case sensitive.
+	 * 
+	 * @param type the sub-type
+	 * @return {@code this}
 	 * 
 	 * @throws IllegalArgumentException
 	 *             if either {@code type} or its simple name have already been

@@ -109,7 +109,7 @@ import java.util.Map;
  * <pre>
  * {
  *   &#064;code
- *   RuntimeTypeAdapter<Shape> shapeAdapter
+ *   RuntimeTypeAdapter&#60;Shape&#62; shapeAdapter
  *       = RuntimeTypeAdapter.create(Shape.class, "type");
  * }
  * </pre>
@@ -137,7 +137,7 @@ import java.util.Map;
  * <pre>
  * {
  *   &#064;code
- *   RuntimeTypeAdapter<Shape> shapeAdapter = RuntimeTypeAdapter.create(Shape.class)
+ *   RuntimeTypeAdapter&#60;Shape&#62; shapeAdapter = RuntimeTypeAdapter.create(Shape.class)
  *       .registerSubtype(Rectangle.class)
  *       .registerSubtype(Circle.class)
  *       .registerSubtype(Diamond.class);

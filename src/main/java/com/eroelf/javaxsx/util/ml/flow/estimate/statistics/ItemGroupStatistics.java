@@ -21,7 +21,7 @@ public abstract class ItemGroupStatistics<T extends Item>
 	/**
 	 * Increasingly calculates statistics which can be calculated online by seeing new {@link Item} objects one by one.
 	 * 
-	 * @param item
+	 * @param item a newly generated {@link Item} objects
 	 */
 	public abstract void increaseStatistics(T item);
 

@@ -52,7 +52,7 @@ public abstract class InnumerableItemGenerator<T extends Item & UpdatableByItem<
 	 * Creates a specified flow handler for this generator.
 	 * 
 	 * @return a {@link InnumerableFlowHandler} object.
-	 * @see {@link InnumerableFlowHandler}
+	 * @see InnumerableFlowHandler
 	 */
 	protected abstract InnumerableFlowHandler<T> getFlowHandler();
 
@@ -76,7 +76,7 @@ public abstract class InnumerableItemGenerator<T extends Item & UpdatableByItem<
 	 * Returns the {@link NaiveItemFilterHandler} instance by default.
 	 * 
 	 * @return a {@link ItemFilterHandler} object.
-	 * @see {@link ItemFilterHandler}
+	 * @see ItemFilterHandler
 	 */
 	protected ItemFilterHandler<T> getFilterHandler()
 	{
@@ -88,9 +88,9 @@ public abstract class InnumerableItemGenerator<T extends Item & UpdatableByItem<
 	 * 
 	 * @param batchSize the sample batch size.
 	 * @return a {@link BatchScoreableRestrictedBatchSample} object.
-	 * @see {@link BatchScoreableRestrictedBatchSample}
-	 * @see {@link RestrictedBatchSample}
-	 * @see {@link BatchSample}
+	 * @see BatchScoreableRestrictedBatchSample
+	 * @see RestrictedBatchSample
+	 * @see BatchSample
 	 */
 	protected BatchScoreableRestrictedBatchSample<T> createBatchSample(int batchSize)
 	{
@@ -112,7 +112,7 @@ public abstract class InnumerableItemGenerator<T extends Item & UpdatableByItem<
 	 * Returns the {@link IdleItemGroupStatistics} instance by default, which does nothing.
 	 * 
 	 * @return a {@link ItemGroupStatistics} object.
-	 * @see {@link ItemGroupStatistics}
+	 * @see ItemGroupStatistics
 	 */
 	protected ItemGroupStatistics<T> getItemGroupStatistics()
 	{

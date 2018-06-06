@@ -43,24 +43,24 @@ import com.google.gson.Gson;
  * o.someParam="abcd";
  * o.someId=1;
  * &#47;&#47; get the url
- * String url=o.getUrl();&#47;&#47; the url will be "domain/doc?someParam=abcd&someId=1&"
+ * String url=o.getUrl();&#47;&#47; the url will be "domain&#47;doc?someParam=abcd&#38;someId=1&#38;"
  * 
  * &#47;&#47; this is more convenient
- * String urlConvenient=o.someParam("abcd").someId(1).getUrl();&#47;&#47; the urlConvenient will be "domain/doc?someParam=abcd&someId=1&"
+ * String urlConvenient=o.someParam("abcd").someId(1).getUrl();&#47;&#47; the urlConvenient will be "domain&#47;doc?someParam=abcd&#38;someId=1&#38;"
  * </pre>
  * 
  * <p>If sometimes there is already some parameters has been changed for a specified pre-defined {@link ParamInfo} sub-class but the jar has not been updated in time, one can do below if still want to use the {@link ParamInfo} sub-class:</p>
  * <pre>
  * TheParamInfo o1=new TheParamInfo();
  * o1.putAsTemp("newParam", "wxyz");
- * String urlTemp=o1.getUrl();&#47;&#47; the urlTemp will be "domain/doc?newParam=wxyz&"
+ * String urlTemp=o1.getUrl();&#47;&#47; the urlTemp will be "domain&#47;doc?newParam=wxyz&#38;"
  * </pre>
  * 
  * <p>If a secondary directory is in need:</p>
  * <pre>
  * TheParamInfo o2=new TheParamInfo();
  * o2.setDoc("secondary");
- * String urlDoc=o2.someParam("abcd").getUrl();&#47;&#47; the urlDoc will be "domain/doc/secondary?someParam=abcd&"
+ * String urlDoc=o2.someParam("abcd").getUrl();&#47;&#47; the urlDoc will be "domain&#47;doc&#47;secondary?someParam=abcd&#38;"
  * </pre>
  * 
  * <p>url hash is also supported and can be set by using {@link #setHash(Object)} method:</p>
@@ -68,7 +68,7 @@ import com.google.gson.Gson;
  * TheParamInfo o3=new TheParamInfo();
  * o3.putAsTemp("newParam", "wxyz");
  * o3.setHash("abcd");
- * String urlWithHash=o3.getUrl();&#47;&#47; the urlWithHash will be "domain/doc?newParam=wxyz&#abcd"
+ * String urlWithHash=o3.getUrl();&#47;&#47; the urlWithHash will be "domain&#47;doc?newParam=wxyz&#38;#abcd"
  * </pre>
  * 
  * @author weikun.zhong
@@ -129,7 +129,7 @@ public class ParamInfo
 	/**
 	 * Encodes and appends the so far configured url parameters to the given {@code stringBuilder}.
 	 * 
-	 * @param stringBuilder
+	 * @param stringBuilder the {@link StringBuilder} object to which the parameters are to be appended.
 	 * @return the exactly same {@code stringBuilder} object but with the parameters appended.
 	 */
 	public StringBuilder appendAsUrlParam(StringBuilder stringBuilder)

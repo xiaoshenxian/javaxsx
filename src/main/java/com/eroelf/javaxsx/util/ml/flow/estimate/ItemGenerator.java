@@ -26,7 +26,7 @@ public interface ItemGenerator<T extends Item>
 	 * Runs the flow and generates {@link Item} objects without sorting.
 	 * 
 	 * @return a new {@link Item} {@link List} contains the generated objects.
-	 * @see {@link #generate(List)}
+	 * @see #generate(List)
 	 */
 	default public List<T> generate()
 	{

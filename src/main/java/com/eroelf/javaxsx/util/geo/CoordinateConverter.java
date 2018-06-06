@@ -15,9 +15,9 @@ public class CoordinateConverter
 	/**
 	 * WGS84 to GCJ02
 	 * 
-	 * @param wgs84Lat
-	 * @param wgs84Lgt
-	 * @return
+	 * @param wgs84Lat WGS84 latitude
+	 * @param wgs84Lgt WGS84 longitude
+	 * @return the converted GCJ02 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromWGS84ToGCJ02(double wgs84Lat, double wgs84Lgt)
 	{
@@ -40,8 +40,8 @@ public class CoordinateConverter
 	/**
 	 * WGS84 to GCJ02
 	 * 
-	 * @param wgs84LatLgt
-	 * @return
+	 * @param wgs84LatLgt a WGS84 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted GCJ02 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromWGS84ToGCJ02(Coordinate wgs84LatLgt)
 	{
@@ -51,9 +51,9 @@ public class CoordinateConverter
 	/**
 	 * WGS84 to BD09
 	 * 
-	 * @param wgs84Lat
-	 * @param wgs84Lgt
-	 * @return
+	 * @param wgs84Lat WGS84 latitude
+	 * @param wgs84Lgt WGS84 longitude
+	 * @return the converted BD09 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromWGS84ToBD09(double wgs84Lat, double wgs84Lgt)
 	{
@@ -63,8 +63,8 @@ public class CoordinateConverter
 	/**
 	 * WGS84 to BD09
 	 * 
-	 * @param wgs84LatLgt
-	 * @return
+	 * @param wgs84LatLgt a WGS84 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted BD09 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromWGS84ToBD09(Coordinate wgs84LatLgt)
 	{
@@ -74,9 +74,9 @@ public class CoordinateConverter
 	/**
 	 * GCJ02 to WGS84
 	 * 
-	 * @param gcj02Lat
-	 * @param gcj02Lgt
-	 * @return
+	 * @param gcj02Lat GCJ02 latitude
+	 * @param gcj02Lgt GCJ02 longitude
+	 * @return the converted WGS84 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromGCJ02ToWGS84(double gcj02Lat, double gcj02Lgt)
 	{
@@ -99,8 +99,8 @@ public class CoordinateConverter
 	/**
 	 * GCJ02 to WGS84
 	 * 
-	 * @param gcj02LatLgt
-	 * @return
+	 * @param gcj02LatLgt a GCJ02 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted WGS84 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromGCJ02ToWGS84(Coordinate gcj02LatLgt)
 	{
@@ -110,9 +110,9 @@ public class CoordinateConverter
 	/**
 	 * GCJ02 to BD09
 	 * 
-	 * @param gcj02Lat
-	 * @param gcj02Lgt
-	 * @return
+	 * @param gcj02Lat GCJ02 latitude
+	 * @param gcj02Lgt GCJ02 longitude
+	 * @return the converted BD09 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromGCJ02ToBD09(double gcj02Lat, double gcj02Lgt)
 	{
@@ -124,8 +124,8 @@ public class CoordinateConverter
 	/**
 	 * GCJ02 to BD09
 	 * 
-	 * @param gcj02LatLgt
-	 * @return
+	 * @param gcj02LatLgt a GCJ02 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted BD09 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromGCJ02ToBD09(Coordinate gcj02LatLgt)
 	{
@@ -135,9 +135,9 @@ public class CoordinateConverter
 	/**
 	 * BD09 to GCJ02
 	 * 
-	 * @param bd09Lat
-	 * @param bd09Lgt
-	 * @return
+	 * @param bd09Lat BD09 latitude
+	 * @param bd09Lgt BD09 longitude
+	 * @return the converted GCJ02 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromBD09ToGCJ02(double bd09Lat, double bd09Lgt)
 	{
@@ -150,8 +150,8 @@ public class CoordinateConverter
 	/**
 	 * BD09 to GCJ02
 	 * 
-	 * @param bd09LatLgt
-	 * @return
+	 * @param bd09LatLgt a BD09 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted GCJ02 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromBD09ToGCJ02(Coordinate bd09LatLgt)
 	{
@@ -161,9 +161,9 @@ public class CoordinateConverter
 	/**
 	 * BD09 to WGS84
 	 * 
-	 * @param bd09Lat
-	 * @param bd09Lgt
-	 * @return
+	 * @param bd09Lat BD09 latitude
+	 * @param bd09Lgt BD09 longitude
+	 * @return the converted WGS84 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromBD09ToWGS84(double bd09Lat, double bd09Lgt)
 	{
@@ -173,8 +173,8 @@ public class CoordinateConverter
 	/**
 	 * BD09 to WGS84
 	 * 
-	 * @param bd09LatLgt
-	 * @return
+	 * @param bd09LatLgt a BD09 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return the converted WGS84 {@link Coordinate} object in the order of (latitude, longitude) corresponding to the original coordinate.
 	 */
 	public static Coordinate fromBD09ToWGS84(Coordinate bd09LatLgt)
 	{
@@ -184,9 +184,9 @@ public class CoordinateConverter
 	/**
 	 * If the given latitude and longitude is out of China.
 	 * 
-	 * @param wgs84Lat
-	 * @param wgs84Lgt
-	 * @return
+	 * @param wgs84Lat WGS84 latitude
+	 * @param wgs84Lgt WGS84 longitude
+	 * @return {@code true} if the point corresponding to the given latitude and longitude is out of China, otherwise {@code false}.
 	 */
 	public static boolean isOutOfChina(double wgs84Lat, double wgs84Lgt)
 	{
@@ -196,8 +196,8 @@ public class CoordinateConverter
 	/**
 	 * If the given coordinate is out of China.
 	 * 
-	 * @param wgs84LatLgt
-	 * @return
+	 * @param wgs84LatLgt a WGS84 {@link Coordinate} object that in the order of (latitude, longitude).
+	 * @return {@code true} if the point corresponding to the given coordinate is out of China, otherwise {@code false}.
 	 */
 	public static boolean isOutOfChina(Coordinate wgs84LatLgt)
 	{

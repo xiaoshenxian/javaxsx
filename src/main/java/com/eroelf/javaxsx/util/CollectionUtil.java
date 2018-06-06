@@ -21,6 +21,8 @@ public class CollectionUtil
 	 * Put all elements that both collection c1 and collection c2 has into the retainedCollection, maintaining both c1 and c2 unchanged.
 	 * This method will first adds all elements of the smaller collection of c1 and c2 into retainedCollection, and then calls the {@linkplain Collection retainAll} methods of the retainedCollection with c2 as the parameter.
 	 * 
+	 * @param <T> the element type.
+	 * 
 	 * @param c1 One Collection object to be processing.
 	 * @param c2 The other Collection object to be processing.
 	 * @param retainedCollection Receive the retaining result.
@@ -43,7 +45,9 @@ public class CollectionUtil
 	 * Retains only the elements in sorted collection c1 that are contained in sorted collection c2.
 	 * In other words, removes from sorted collection c1 all of its elements that are not contained in sorted collection c2.
 	 * <p><i>Both collections must be sorted by the <b>same comparator</b> before calling this method, and their iterator() method must be able to return an iterator which can <b>iterate the collection according to the sorted order</b>.</i></p>
-	 *
+	 * 
+	 * @param <T> the element type.
+	 * 
 	 * @param c1 Collection containing elements to be checking for retaining according to elements in c2.
 	 * @param c2 Collection containing elements to be retaining in c1.
 	 */
@@ -87,7 +91,9 @@ public class CollectionUtil
 	/**
 	 * Put all the elements in sorted collection c1 that are contained in sorted collection c2 into collection retainedCollection, maintaining the insertion order the same as the sorted order (which must be the same order the input collections' iterator() method gives), and leaving both the input collections unchanged.
 	 * <p><i>Both input collections must be sorted by the <b>same comparator</b> before calling this method, and their iterator() method must be able to return an iterator which can <b>iterate the collection according to the sorted order</b>.</i></p>
-	 *
+	 * 
+	 * @param <T> the element type.
+	 * 
 	 * @param c1 Collection containing elements to be checking for retaining according to elements in c2.
 	 * @param c2 Collection containing elements to be retaining in c1.
 	 * @param retainedCollection Receives the retaining result.
@@ -126,6 +132,8 @@ public class CollectionUtil
 	/**
 	 * Randomly select selectSize elements from values, maintaining the original order of the data provided. The size of values may be unknown.
 	 * 
+	 * @param <T> the element type.
+	 * 
 	 * @param values The {@link Iterable} object contains the data to be selecting.
 	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data contained in the values, all data will be retained.
 	 * @param des The receiver list of the selected elements.
@@ -137,6 +145,8 @@ public class CollectionUtil
 
 	/**
 	 * Randomly select selectSize elements from valuesIter, maintaining the original order of the data provided. The size of valuesIter may be unknown.
+	 * 
+	 * @param <T> the element type.
 	 * 
 	 * @param valuesIter The iterator of the data to be selecting.
 	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data provided by the valuesIter, all data will be retained.

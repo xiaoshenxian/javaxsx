@@ -47,7 +47,7 @@ public abstract class Converter<T extends Item, I extends Info, L extends InfoLo
 	 * @param verboseInfo if keep more information in the {@link Info} objects.
 	 * @param verboseLog if keep more information in the {@link InfoLog} objects.
 	 * @return an {@code int[]} contains three elements which the first one is the true ending index, the second one is the number of {@link Item} objects which are successfully converted, and the third one is the number of {@link Item} objects which failed during converting.
-	 * @see {@link #convert(List, List, List, InfoFactory, InfoLogFactory, int, int, boolean, boolean)}
+	 * @see #convert(List, List, List, InfoFactory, InfoLogFactory, int, int, boolean, boolean)
 	 */
 	public int[] convert(List<? extends T> itemList, List<? super I> infoList, List<? super L> infoLogList, int start, int length, boolean verboseInfo, boolean verboseLog)
 	{
@@ -72,7 +72,7 @@ public abstract class Converter<T extends Item, I extends Info, L extends InfoLo
 	 * @param verboseInfo if keep more information in the {@link Info} objects.
 	 * @param verboseLog if keep more information in the {@link InfoLog} objects.
 	 * @return an {@code int[]} contains three elements which the first one is the true ending index, the second one is the number of {@link Item} objects which are successfully converted, and the third one is the number of {@link Item} objects which failed during converting.
-	 * @see {@link #convert(List, List, List, int, int, boolean, boolean)}
+	 * @see #convert(List, List, List, int, int, boolean, boolean)
 	 */
 	public static <T extends Item, I extends Info, L extends InfoLog> int[] convert(List<? extends T> itemList, List<? super I> infoList, List<? super L> infoLogList, InfoFactory<T, I> infoFactory, InfoLogFactory<T, L> infoLogFactory, int start, int length, boolean verboseInfo, boolean verboseLog)
 	{

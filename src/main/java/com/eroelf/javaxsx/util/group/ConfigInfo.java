@@ -2,8 +2,10 @@ package com.eroelf.javaxsx.util.group;
 
 import java.util.Date;
 
+import com.eroelf.javaxsx.util.group.GroupingUtil.Group;
+
 /**
- * The {@link Group} information.
+ * The information for constructing a {@link Group} instance.
  * 
  * @author weikun.zhong
  */

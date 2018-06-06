@@ -13,11 +13,11 @@ import java.util.stream.StreamSupport;
 
 /**
  * This class converts an input file to an iterator whose next() method returns the processed result of each line.
- * Override {@link #lineProcessor(String)} to process each line or just invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method.
+ * Override {@link #processLine(String)} to process each line or just invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method.
  * 
  * @author weikun.zhong
  *
- * @param <E> E is the return type of the next() method.
+ * @param <E> E is the return type of the {@link #next()} method.
  */
 public class FileIterator<E> implements Iterator<E>
 {

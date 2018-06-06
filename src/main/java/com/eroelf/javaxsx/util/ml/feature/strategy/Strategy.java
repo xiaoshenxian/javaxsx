@@ -18,14 +18,14 @@ import com.eroelf.javaxsx.util.ml.flow.controller.filter.ItemFilter;
 public abstract class Strategy<T extends Item> implements Modeler
 {
 	/**
-	 * Provides a set contains {@link Item} instances which satisfy this strategy but without being modeled.
+	 * Provides a set contains {@link Item} instances which correspond to this strategy but without being modeled.
 	 * 
-	 * @return
+	 * @return a {@link Set} object contains all the candidates correspond to this strategy.
 	 */
 	protected abstract Set<T> candicates();
 
 	/**
-	 * Generates a list of modeled {@link Item} instances which satisfy this strategy.
+	 * Generates a list of modeled {@link Item} instances which correspond to this strategy.
 	 * 
 	 * @param preFilter a filter provide some additional restrictions which may be related to a specified situation but has nothing to do with this strategy.
 	 * @return the generated {@link Item} instances list.

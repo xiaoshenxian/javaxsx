@@ -39,6 +39,7 @@ public interface Trie extends Serializable
 	 * 
 	 * @param prefix the specified prefix.
 	 * @param resultList receives the result.
+	 * @return the input {@code resultList} with all found words appended.
 	 */
 	public List<String> matchPrefix(String prefix, List<String> resultList);
 
@@ -47,6 +48,7 @@ public interface Trie extends Serializable
 	 * 
 	 * @param word the word to be checked.
 	 * @param resultList receives the result.
+	 * @return the input {@code resultList} with all found prefixes appended.
 	 */
 	public List<String> getPrefixes(String word, List<String> resultList);
 
@@ -55,6 +57,7 @@ public interface Trie extends Serializable
 	 * 
 	 * @param word the word to be checked.
 	 * @param resultList receives the result.
+	 * @return the input {@code resultList} with all found sub-words appended.
 	 */
 	default public List<String> getSubWords(String word, List<String> resultList)
 	{

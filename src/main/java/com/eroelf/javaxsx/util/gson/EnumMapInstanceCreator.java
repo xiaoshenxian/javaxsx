@@ -9,11 +9,11 @@ import com.google.gson.InstanceCreator;
  * Instance creator to help to create an EnumMap for the given {@code enum} key and an arbitrary specified value.
  * 
  * <p>
+ * 
  * Usage:
  * <pre>
  * new GsonBuilder().registerTypeAdapter(new TypeToken&lt;Map&lt;K, V&gt;&gt;(){}.getType(), new EnumMapInstanceCreator&lt;K, V&gt;(K.class));
  * </pre>
- * </p>
  * 
  * @author weikun.zhong
  *

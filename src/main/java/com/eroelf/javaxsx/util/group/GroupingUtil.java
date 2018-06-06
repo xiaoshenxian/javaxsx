@@ -75,8 +75,8 @@ public final class GroupingUtil
 		 * @param name the target group name.
 		 * @return {@code true} if the specified group is the group that exists in the facet represented by {@code facetName}, and with its name equals the given name, otherwise {@code false}.
 		 * 
-		 * @see {@link GroupingUtil#is(Group, String, String)}
-		 * @see {@link Facet#is(Group, String)}
+		 * @see GroupingUtil#is(Group, String, String)
+		 * @see Facet#is(Group, String)
 		 */
 		public boolean is(String facetName, String name)
 		{
@@ -87,7 +87,7 @@ public final class GroupingUtil
 		 * If any project wish to delegate {@link Group} instances to handle its different logical paths ({@link Group} strategies), this method should be called to assigned a handler to this group before any call of {@link Group#apply(Parameter)}.
 		 * This method should be called by calling {@link Facet#setTasks(GroupTask...)}
 		 * 
-		 * @param groupTask
+		 * @param groupTask the task handler to be assigned to {@code this} {@link Group}. 
 		 */
 		public void setTask(GroupTask groupTask)
 		{
@@ -271,8 +271,8 @@ public final class GroupingUtil
 		 * @param name the target name.
 		 * @return return {@code true} if the specified group is the group that exists in this facet and with its name equals the given name, otherwise {@code false}.
 		 * 
-		 * @see {@link GroupingUtil#is(Group, String, String)}
-		 * @see {@link Group#is(String, String)}
+		 * @see GroupingUtil#is(Group, String, String)
+		 * @see Group#is(String, String)
 		 */
 		public boolean is(Group group, String name)
 		{
@@ -439,8 +439,8 @@ public final class GroupingUtil
 	 * @param name the target group name.
 	 * @return return {@code true} if the specified group is the group that exists in the facet represented by {@code facetName}, and with its name equals the given name, otherwise {@code false}.
 	 * 
-	 * @see {@link Facet#is(Group, String)}
-	 * @see {@link Group#is(Group, String)}
+	 * @see Facet#is(Group, String)
+	 * @see Group#is(String, String)
 	 */
 	public static boolean is(Group group, String facetName, String name)
 	{
@@ -701,7 +701,7 @@ public final class GroupingUtil
 	 * Get the configuration string of all facets.
 	 * 
 	 * @return the configuration string
-	 * @see {@link GroupingUtil#config(IdentifierValidator, HashGetter, String)}
+	 * @see GroupingUtil#config(IdentifierValidator, HashGetter, String)
 	 */
 	public static String getConfig()
 	{

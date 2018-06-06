@@ -9,11 +9,11 @@ import com.google.gson.InstanceCreator;
  * Instance creator to help to create an EnumSet for the given {@code enum} type.
  * 
  * <p>
+ * 
  * Usage:
  * <pre>
  * new GsonBuilder().registerTypeAdapter(new TypeToken&lt;Set&lt;E&gt;&gt;(){}.getType(), new EnumSetInstanceCreator&lt;E&gt;(E.class));
  * </pre>
- * </p>
  * 
  * @author weikun.zhong
  *
