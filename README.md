@@ -46,13 +46,13 @@ doDb.close();
 doDb.prepareStatement("insert into person (id, name, age, learning_subject) values (?, ?, ?, ?)");
 while(...)
 {
-	...
-	String id=...
-	String name=...
-	int age=...
-	String learning_subject=...
-	doDb.addBatch(id, name, age, learning_subject);
-	...
+    ...
+    String id=...
+    String name=...
+    int age=...
+    String learning_subject=...
+    doDb.addBatch(id, name, age, learning_subject);
+    ...
 }
 doDb.executeBatch();
 ```
@@ -62,10 +62,10 @@ doDb.executeBatch();
 ```java
 public class Person
 {
-	public String id;
-	public String name;
-	public int age;
-	public String learningSubject;
+    public String id;
+    public String name;
+    public int age;
+    public String learningSubject;
 }
 
 List<Person> list=doDb.fromQuery(Person.class, true, true, "select id, name, age, learning_subject from person");
@@ -132,14 +132,14 @@ APIs for a simple form to index a branch of objects, implemented by using *HashM
 String fileName="data.gz";
 new FileReader(fileName).lines();
 FileReaderPlus.readAFile(fileName, (line) -> {
-	...
-	return true;
+    ...
+    return true;
 });
 new FileIterator<String>(fileName).lines();
 new DirFileIterator<String>("/").lines();
 ```
 
-Support *text*, *gzip*, *bzip2*, and *zip* format. Extend InputHelper class and override *getCompressType* and *convert* methods to modify compress type judgment and to support more file types.
+Support *text*, *gzip*, *bzip2*, and *zip* format. Extend *InputHelper* class and override *getCompressType* and *convert* methods to modify compress type judgment and to support more file types.
 
 ##### Compressor
 
