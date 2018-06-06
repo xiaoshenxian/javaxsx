@@ -3,6 +3,8 @@
 
 # maven ignore
 target/
+pom.xml.releaseBackup
+release.properties
 
 # test ignore
 src/test/
