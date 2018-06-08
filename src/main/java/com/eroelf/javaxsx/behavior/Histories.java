@@ -125,8 +125,8 @@ public final class Histories
 	 * The two lists will first be combined and sorted, and then any H2 object between two adjacent H1 objects and satisfied the given {@link FuseStrategy} object will be fused to the first H1 object and generate a H3 object.
 	 * Any single H1 or H2 object will be changed into H3 object according to the given strategy.
 	 * 
-	 * @param <H1> the type of {@link History} objects in the {@code list1}.
-	 * @param <H2> the type of {@link History} objects in the {@code list2}.
+	 * @param <H1> the type of {@link History} objects in {@code list1}.
+	 * @param <H2> the type of {@link History} objects in {@code list2}.
 	 * @param <H3> the type of {@link History} objects in the ouput list.
 	 * 
 	 * @param list1 The H1 object list.
