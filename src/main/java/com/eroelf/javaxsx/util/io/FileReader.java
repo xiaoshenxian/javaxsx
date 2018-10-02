@@ -108,16 +108,14 @@ public class FileReader
 	public void load(InputHelper inputHelper)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader();
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader();
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -129,16 +127,14 @@ public class FileReader
 	public void load(InputHelper inputHelper, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -150,16 +146,14 @@ public class FileReader
 	public void load(InputHelper inputHelper, File file)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(file);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(file);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -171,16 +165,14 @@ public class FileReader
 	public void load(InputHelper inputHelper, File file, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(file, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(file, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -192,16 +184,14 @@ public class FileReader
 	public void load(InputHelper inputHelper, String fileNameString)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(fileNameString);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(fileNameString);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -213,16 +203,14 @@ public class FileReader
 	public void load(InputHelper inputHelper, String fileNameString, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(fileNameString, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -234,16 +222,14 @@ public class FileReader
 	public <T> void load(InputHelper inputHelper, Class<T> desClass, String fileNameString)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(desClass, fileNameString);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(desClass, fileNameString);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -255,16 +241,14 @@ public class FileReader
 	public <T> void load(InputHelper inputHelper, Class<T> desClass, String fileNameString, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -274,13 +258,13 @@ public class FileReader
 		try
 		{
 			line=br.readLine();
+			if(line==null)
+				close();
 		}
 		catch(IOException e)
 		{
 			throw new UncheckedIOException(e);
 		}
-		if(line==null)
-			close();
 		return line;
 	}
 
@@ -293,25 +277,26 @@ public class FileReader
 			return null;
 	}
 
-	public boolean close()
+	public void close() throws IOException
 	{
 		if(br!=null)
 		{
+			br.close();
+			br=null;
+		}
+	}
+
+	public Stream<String> lines()
+	{
+		return br!=null ? br.lines().onClose(() -> {
 			try
 			{
-				br.close();
-				br=null;
+				close();
 			}
 			catch(IOException e)
 			{
 				throw new UncheckedIOException(e);
 			}
-		}
-		return true;
-	}
-
-	public Stream<String> lines()
-	{
-		return br!=null ? br.lines().onClose(this::close) : null;
+		}) : null;
 	}
 }

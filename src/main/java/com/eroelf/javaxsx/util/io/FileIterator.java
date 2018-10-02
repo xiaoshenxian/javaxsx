@@ -117,16 +117,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader();
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader();
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -138,16 +136,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -159,16 +155,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper, File file)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=inputHelper.getBufferedReader(file);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=inputHelper.getBufferedReader(file);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -180,16 +174,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper, File file, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(file, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(file, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -201,16 +193,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper, String fileNameString)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=inputHelper.getBufferedReader(fileNameString);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=inputHelper.getBufferedReader(fileNameString);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -222,16 +212,14 @@ public class FileIterator<E> implements Iterator<E>
 	public void load(InputHelper inputHelper, String fileNameString, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(fileNameString, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -243,16 +231,14 @@ public class FileIterator<E> implements Iterator<E>
 	public <T> void load(InputHelper inputHelper, Class<T> desClass, String fileNameString)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=inputHelper.getBufferedReader(desClass, fileNameString);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=inputHelper.getBufferedReader(desClass, fileNameString);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -264,34 +250,24 @@ public class FileIterator<E> implements Iterator<E>
 	public <T> void load(InputHelper inputHelper, Class<T> desClass, String fileNameString, int bufferSize)
 	{
 		this.inputHelper=inputHelper;
-		if(close())
+		try
 		{
-			try
-			{
-				br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			close();
+			br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
 		}
 	}
 
-	public boolean close()
+	public void close() throws IOException
 	{
 		if(br!=null)
 		{
-			try
-			{
-				br.close();
-				br=null;
-			}
-			catch(IOException e)
-			{
-				throw new UncheckedIOException(e);
-			}
+			br.close();
+			br=null;
 		}
-		return true;
 	}
 
 	@Override
@@ -314,7 +290,14 @@ public class FileIterator<E> implements Iterator<E>
 				return true;
 			else
 			{
-				close();
+				try
+				{
+					close();
+				}
+				catch(IOException e)
+				{
+					throw new UncheckedIOException(e);
+				}
 				return false;
 			}
 		}

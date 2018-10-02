@@ -70,7 +70,7 @@ public final class Strings
 	public static String join(String joiner, String... strings)
 	{
 		return join(joiner, 0, strings.length, strings);
-	}	
+	}
 
 	public static String join(String joiner, int begin, int end, String... strings)
 	{
@@ -180,10 +180,10 @@ public final class Strings
 
 	public static char toHalfWidth(char c)
 	{
-		if(c==12288)
-			return (char)32;
-		else if(c>=65248 && c<65375)
-			return (char)(c-65248);
+		if(c==0x3000)
+			return (char)0x0020;
+		else if(c>0xff00 && c<0xff5f)
+			return (char)(c-0xfee0);
 		else
 			return c;
 	}
@@ -200,10 +200,10 @@ public final class Strings
 
 	public static char toFullWidth(char c)
 	{
-		if(c==32)
-			return (char)12288;
-		else if(c<127)
-			return (char)(c+65248);
+		if(c==0x0020)
+			return (char)0x3000;
+		else if(c>0x0020 && c<0x007f)
+			return (char)(c+0xfee0);
 		else
 			return c;
 	}
@@ -220,17 +220,16 @@ public final class Strings
 
 	public static char toHalfWidthChineseCompatible(char c)
 	{
-		if(c==12288)
-			return (char)32;
-		else if((c>=65248 && c<65281)//！
-			 || (c>65281 && c<65288)//（）
-			 || (c>65289 && c<65292)//，
-			 || (c>65292 && c<65306)//：；
-			 || (c>65307 && c<65311)//？
-			 || (c>65311 && c<65371)//｛
-			 || (c>65371 && c<65373)//｝
-			 || (c>65373 && c<65375))
-			return (char)(c-65248);
+		if(c==0x3000)
+			return (char)0x0020;
+		else if((c>0xff01 && c<0xff08)//！（）
+			 || (c>0xff09 && c<0xff0c)//，
+			 || (c>0xff0c && c<0xff1a)//：；
+			 || (c>0xff1b && c<0xff1f)//？
+			 || (c>0xff1f && c<0xff5b)//｛
+			 || (c>0xff5b && c<0xff5d)//｝
+			 || (c>0xff5d && c<0xff5f))
+			return (char)(c-0xfee0);
 		else
 			return c;
 	}
@@ -247,17 +246,16 @@ public final class Strings
 
 	public static char toFullWidthChineseCompatible(char c)
 	{
-		if(c==32)
-			return (char)12288;
-		else if((c<33)//!
-			 || (c>33 && c<40)//()
-			 || (c>41 && c<44)//,
-			 || (c>44 && c<58)//:;
-			 || (c>59 && c<63)//?
-			 || (c>63 && c<123)//{
-			 || (c>123 && c<125)//}
-			 || (c>125 && c<127))
-			return (char)(c+65248);
+		if(c==0x0020)
+			return (char)0x3000;
+		else if((c>0x0021 && c<0x0028)//!()
+			 || (c>0x0029 && c<0x002c)//,
+			 || (c>0x002c && c<0x003a)//:;
+			 || (c>0x003b && c<0x003f)//?
+			 || (c>0x003f && c<0x007b)//{
+			 || (c>0x007b && c<0x007d)//}
+			 || (c>0x007d && c<0x007f))
+			return (char)(c+0xfee0);
 		else
 			return c;
 	}
@@ -272,6 +270,21 @@ public final class Strings
 		return new String(chars);
 	}
 
+	public static boolean isEnglishLetter(char c)
+	{
+		return (c>='A' && c<='Z') || (c>='a' && c<='z');
+	}
+
+	public static boolean isEnglishLetter(String s)
+	{
+		return s.matches("[A-Za-z]+");
+	}
+
+	public static boolean containsEnglishLetter(String s)
+	{
+		return s.matches(".*[A-Za-z].*");
+	}
+
 	public static boolean isChinese(char c)
 	{
 		return (c>=0x4e00 && c<=0x9fa5);
@@ -279,14 +292,12 @@ public final class Strings
 
 	public static boolean isChinese(String s)
 	{
-		final String regex="["+(char)0x4e00+"-"+(char)0x9fa5+"]+";
-		return s.matches(regex);
+		return s.matches("["+(char)0x4e00+"-"+(char)0x9fa5+"]+");
 	}
 
 	public static boolean containsChinese(String s)
 	{
-		final String regex=".*["+(char)0x4e00+"-"+(char)0x9fa5+"].*";
-		return s.matches(regex);
+		return s.matches(".*["+(char)0x4e00+"-"+(char)0x9fa5+"].*");
 	}
 
 	public static boolean isCJKCharacter(char c)
@@ -296,7 +307,7 @@ public final class Strings
 
 	public static boolean isCJKCharacter(UnicodeBlock ub)
 	{
-		return ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub==UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub==UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT;
+		return ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_C || ub==UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_D || ub==UnicodeBlock.CJK_RADICALS_SUPPLEMENT || ub==UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub==UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT;
 	}
 
 	public static boolean isJapaneseKana(char c)
@@ -317,7 +328,22 @@ public final class Strings
 
 	public static boolean isEnglishPunctuation(char c)
 	{
-		return (c>'\u0020' && c<='\u002F') || (c>='\u003A' && c<='\u0040') || (c>='\u005B' && c<='\u0060') || (c>='\u007B' && c<='\u007E');
+		return (c>0x0020 && c<=0x002f) || (c>=0x003a && c<=0x0040) || (c>=0x005b && c<=0x0060) || (c>=0x007b && c<=0x007e);
+	}
+
+	public static boolean isLatin1PunctuationAndSymbols(char c)
+	{
+		return (c>0x00a0 && c<=0x00bf) || c==0x00d7 || c==0x00f7;
+	}
+
+	public static boolean isGeneralAndSupplementalPunctuation(char c)
+	{
+		return isGeneralAndSupplementalPunctuation(UnicodeBlock.of(c));
+	}
+
+	public static boolean isGeneralAndSupplementalPunctuation(UnicodeBlock ub)
+	{
+		return ub==UnicodeBlock.GENERAL_PUNCTUATION || ub==UnicodeBlock.SUPPLEMENTAL_PUNCTUATION;
 	}
 
 	public static boolean isCJKPunctuation(char c)
@@ -327,12 +353,12 @@ public final class Strings
 
 	public static boolean isCJKPunctuation(UnicodeBlock ub)
 	{
-		return ub==UnicodeBlock.GENERAL_PUNCTUATION || ub==UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION || ub==UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub==UnicodeBlock.CJK_COMPATIBILITY_FORMS;
+		return ub==UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION || ub==UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub==UnicodeBlock.CJK_COMPATIBILITY_FORMS;
 	}
 
 	public static boolean isPunctuation(char c)
 	{
-		return isEnglishPunctuation(c) || isCJKPunctuation(c);
+		return isEnglishPunctuation(c) || isLatin1PunctuationAndSymbols(c) || isGeneralAndSupplementalPunctuation(c) || isCJKPunctuation(c);
 	}
 
 	public static char number2ChineseNumber(char c)

@@ -1,10 +1,14 @@
 # javaxsx
 
-Tools and utilities in Java.
+Some simple and lightweight tools and utilities in Java.
 
 ## Usage
 
 ### Maven dependency:
+
+[Nexus Repository Manager](https://oss.sonatype.org/#nexus-search;gav~com.eroelf~javaxsx~~~)
+
+[Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Cjavaxsx)
 
 ```
 <dependency>
@@ -20,7 +24,7 @@ Tools and utilities in Java.
 
 This package provides some basic definition for an event happened at a specified time, say, *History*.
 
-If the *History* is related to a subjective action, it becomes a *Behavior*. As many web sites are concerned, users is a basic dimension, so there comes *UserBehavior*.
+If a *History* is related to a subjective action, it becomes a *Behavior*. As many web sites are concerned, users is a basic dimension, so there comes *UserBehavior*.
 
 *Behaviors* class defines some basic methods to deal with behaviors.
 
@@ -50,8 +54,8 @@ while(...)
     String id=...
     String name=...
     int age=...
-    String learning_subject=...
-    doDb.addBatch(id, name, age, learning_subject);
+    String learningSubject=...
+    doDb.addBatch(id, name, age, learningSubject);
     ...
 }
 doDb.executeBatch();
@@ -75,7 +79,7 @@ List<Person> list=doDb.fromQuery(Person.class, true, true, "select id, name, age
 
 Provides some simple API for geography.
 
-##### Coordinate convert
+##### Convert coordinates
 
 ```java
 System.out.println(CoordinateConverter.fromWGS84ToGCJ02(39.9671454379, 116.3281085168));
@@ -116,7 +120,7 @@ System.out.println(group.getGroupName());
 \> A
 ```
 
-One may like to delegate a *Group* object to apply a special strategy on objects under this group. Just assign a *GroupTask* functional interface to the Group object.
+One may like to delegate a *Group* object to apply a special strategy on objects in this group. Just assign a *GroupTask* functional interface to the *Group* object.
 
 Classes in package updater are helpful for update grouping configures from a specified source, e.g., a database.
 
@@ -189,7 +193,7 @@ System.out.println(dataPreProcessor.getProcessedMin());
 \> 2.0
 \> 0.875
 \> 0.125
---------------------------------
+\> --------------------------------
 \> -2.0
 \> 0.30618621784789724
 \> -8.0
@@ -219,7 +223,7 @@ System.out.println(histStr);
 
 This package is an abstract core working flow of any certain recall, recommendation, estimating, scoring, and ranking system.
 
-There is a [demo](https://github.com/xiaoshenxian/modeling_demo) for simple usage.
+There is a [demo](https://github.com/xiaoshenxian/modeling_demo) for a simple usage.
 
 * feature package
 
@@ -277,6 +281,10 @@ Help to construct and parse URLs.
 
 Help to request URLs. There is **NO** support for connection pools and standing connections.
 
+##### *HttpRequesterClient* class
+
+Implemented an HTTP requester connection pool client.
+
 #### trie
 
 Implemented *HashMapTrie* and *DoubleArrayTrie*, and a simple trie division algorithm in *IndexedTrie*.
@@ -294,6 +302,8 @@ Implemented *HashMapTrie* and *DoubleArrayTrie*, and a simple trie division algo
 ##### *NumBytes*
 
 ##### *TimeLasted*
+
+##### *ArrayUtil*
 
 ## Authors
 
