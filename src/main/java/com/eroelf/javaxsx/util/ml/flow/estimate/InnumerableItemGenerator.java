@@ -12,7 +12,6 @@ import com.eroelf.javaxsx.util.ml.feature.model.Modeler;
 import com.eroelf.javaxsx.util.ml.feature.score.Scorer;
 import com.eroelf.javaxsx.util.ml.feature.strategy.Strategy;
 import com.eroelf.javaxsx.util.ml.flow.controller.InnumerableFlowHandler;
-import com.eroelf.javaxsx.util.ml.flow.controller.filter.ItemFilter;
 import com.eroelf.javaxsx.util.ml.flow.controller.filter.ItemFilterHandler;
 import com.eroelf.javaxsx.util.ml.flow.controller.filter.NaiveItemFilterHandler;
 import com.eroelf.javaxsx.util.ml.flow.estimate.statistics.IdleItemGroupStatistics;
@@ -43,7 +42,7 @@ public abstract class InnumerableItemGenerator<T extends Item> implements ItemGe
 	protected abstract void saveToExisted(T item);
 
 	/**
-	 * Traverses all {@link Item} objects after all {@link Strategy} instances finished their {@link Strategy#generate(ItemFilter) generate} methods.
+	 * Traverses all {@link Item} objects after all {@link Strategy} instances finished their {@link Strategy#generate(Predicate) generate} methods.
 	 * 
 	 * @return an {@link Iterable} group of those {@link Item} objects.
 	 */
