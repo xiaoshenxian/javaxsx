@@ -114,9 +114,7 @@ public class MapFeatureItem extends Item
 		@Override
 		public int compare(Entry<Integer, Double> o1, Entry<Integer, Double> o2)
 		{
-			int k1=o1.getKey();
-			int k2=o2.getKey();
-			return k1<k2 ? -1 : (k1==k2 ? 0 : 1);
+			return Integer.compare(o1.getKey(), o2.getKey());
 		}
 	};
 

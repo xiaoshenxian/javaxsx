@@ -1,8 +1,7 @@
 package com.eroelf.javaxsx.util.geo;
 
 import org.geotools.referencing.GeodeticCalculator;
-
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Some APIs to deal with geographic information.

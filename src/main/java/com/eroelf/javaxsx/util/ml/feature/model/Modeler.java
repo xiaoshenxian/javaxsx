@@ -7,6 +7,7 @@ import java.util.function.UnaryOperator;
  * 
  * @author weikun.zhong
  */
+@FunctionalInterface
 public interface Modeler extends UnaryOperator<Modelable>
 {
 	public Modelable model(Modelable modelable);

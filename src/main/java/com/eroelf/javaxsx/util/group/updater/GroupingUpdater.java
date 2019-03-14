@@ -1,6 +1,6 @@
 package com.eroelf.javaxsx.util.group.updater;
 
-import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,13 +49,13 @@ public final class GroupingUpdater
 		GroupingUpdater.hashGetterFactory=hashGetterFactory;
 	}
 
-	public static Set<String> updateGroupingConfig(List<ConfigInfo> configInfoList, String oldModifiedTime)
+	public static Set<String> updateGroupingConfig(List<ConfigInfo> configInfoList, Date oldModifiedTime)
 	{
 		Set<String> facetNameSet=new HashSet<>();
 		for(ConfigInfo configInfo : configInfoList)
 		{
 			facetNameSet.add(configInfo.facetName);
-			if(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(configInfo.updateTime).compareTo(oldModifiedTime)>0)
+			if(configInfo.updateTime.after(oldModifiedTime))
 				GroupingUtil.configFacet(configInfo, identifierValidatorFactory.create(configInfo.facetName), hashGetterFactory.create(configInfo.facetName));
 		}
 		return facetNameSet;
@@ -73,7 +73,7 @@ public final class GroupingUpdater
 	public static boolean update(boolean needDelete, boolean useRegex, String... facetNames) throws Exception
 	{
 		List<ConfigInfo> configInfoList=null;
-		String oldModifiedTime=null;
+		Date oldModifiedTime=null;
 		source.open();
 		try
 		{

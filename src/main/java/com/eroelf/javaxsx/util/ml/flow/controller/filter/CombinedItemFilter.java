@@ -1,7 +1,6 @@
 package com.eroelf.javaxsx.util.ml.flow.controller.filter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Predicate;
 
 import com.eroelf.javaxsx.util.ml.feature.Item;
 
@@ -12,7 +11,7 @@ import com.eroelf.javaxsx.util.ml.feature.Item;
  */
 public class CombinedItemFilter<T extends Item> implements ItemFilter<T>
 {
-	private List<ItemFilter<T>> filterList=new ArrayList<>();
+	private Predicate<T> predicate;
 
 	public CombinedItemFilter(@SuppressWarnings("unchecked") ItemFilter<T>... itemFilters)
 	{
@@ -25,18 +24,13 @@ public class CombinedItemFilter<T extends Item> implements ItemFilter<T>
 	@Override
 	public boolean test(T item)
 	{
-		for(ItemFilter<T> itemFilter : filterList)
-		{
-			if(!itemFilter.test(item))
-				return false;
-		}
-		return true;
+		return predicate.test(item);
 	}
 
 	public CombinedItemFilter<T> addFilter(ItemFilter<T> itemFilter)
 	{
 		if(itemFilter!=null)
-			filterList.add(itemFilter);
+			predicate=predicate!=null ? predicate.and(itemFilter) : itemFilter;
 		return this;
 	}
 }

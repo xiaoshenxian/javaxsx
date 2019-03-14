@@ -25,13 +25,13 @@ public class FileIterator<E> implements Iterator<E>
 	protected String line;
 	protected BufferedReader br=null;
 
-	protected FileIterator(boolean loadSystemIn)
+	public FileIterator(boolean loadSystemIn)
 	{
 		if(loadSystemIn)
 			load();
 	}
 
-	protected FileIterator(boolean loadSystemIn, InputHelper inputHelper)
+	public FileIterator(boolean loadSystemIn, InputHelper inputHelper)
 	{
 		if(loadSystemIn)
 			load(inputHelper);
@@ -39,12 +39,12 @@ public class FileIterator<E> implements Iterator<E>
 			this.inputHelper=inputHelper;
 	}
 
-	protected FileIterator(int bufferSize)
+	public FileIterator(int bufferSize)
 	{
 		load(bufferSize);
 	}
 
-	protected FileIterator(InputHelper inputHelper, int bufferSize)
+	public FileIterator(InputHelper inputHelper, int bufferSize)
 	{
 		load(inputHelper, bufferSize);
 	}

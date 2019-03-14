@@ -1,10 +1,12 @@
 package com.eroelf.javaxsx.util.ml.flow.controller.filter;
 
+import java.util.function.Predicate;
+
 import com.eroelf.javaxsx.util.ml.feature.Item;
 import com.eroelf.javaxsx.util.ml.flow.estimate.statistics.ItemGroupStatistics;
 
 /**
- * Maintains three {@link ItemFilter} instances which will impact on different stages of a modeling and scoring flow. 
+ * Maintains three {@link Predicate} instances which will perform as filters and impact on different stages of a modeling and scoring flow. 
  * 
  * @author weikun.zhong
  *
@@ -15,22 +17,22 @@ public interface ItemFilterHandler<T extends Item>
 	/**
 	 * Impacts when gets an {@link Item} instance from candidates.
 	 * 
-	 * @return an {@link ItemFilter} object.
+	 * @return an {@link Predicate} object.
 	 */
-	public ItemFilter<T> getPreFilter();
+	public Predicate<T> getPreFilter();
 
 	/**
 	 * Impacts when an {@link Item} instance has been modeled and scored.
 	 * 
-	 * @return an {@link ItemFilter} object.
+	 * @return an {@link Predicate} object.
 	 */
-	public ItemFilter<T> getInnerFilter();
+	public Predicate<T> getInnerFilter();
 
 	/**
 	 * Impacts when all candidates are modeled and scored.
 	 * 
 	 * @param itemGroupStatistics statistics of all candidates.
-	 * @return an {@link ItemFilter} object.
+	 * @return an {@link Predicate} object.
 	 */
-	public ItemFilter<T> getAfterFilter(ItemGroupStatistics<T> itemGroupStatistics);
+	public Predicate<T> getAfterFilter(ItemGroupStatistics<T> itemGroupStatistics);
 }

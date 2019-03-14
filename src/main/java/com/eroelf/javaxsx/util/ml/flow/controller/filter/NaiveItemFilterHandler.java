@@ -1,5 +1,7 @@
 package com.eroelf.javaxsx.util.ml.flow.controller.filter;
 
+import java.util.function.Predicate;
+
 import com.eroelf.javaxsx.util.ml.feature.Item;
 import com.eroelf.javaxsx.util.ml.flow.estimate.statistics.ItemGroupStatistics;
 
@@ -21,19 +23,19 @@ public class NaiveItemFilterHandler<T extends Item> implements ItemFilterHandler
 	}
 
 	@Override
-	public ItemFilter<T> getPreFilter()
+	public Predicate<T> getPreFilter()
 	{
 		return NaiveItemFilter.get();
 	}
 
 	@Override
-	public ItemFilter<T> getInnerFilter()
+	public Predicate<T> getInnerFilter()
 	{
 		return NaiveItemFilter.get();
 	}
 
 	@Override
-	public ItemFilter<T> getAfterFilter(ItemGroupStatistics<T> itemGroupStatistics)
+	public Predicate<T> getAfterFilter(ItemGroupStatistics<T> itemGroupStatistics)
 	{
 		return null;
 	}

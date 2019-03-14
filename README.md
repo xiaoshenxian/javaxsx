@@ -8,7 +8,7 @@ Some simple and lightweight tools and utilities in Java.
 
 [Nexus Repository Manager](https://oss.sonatype.org/#nexus-search;gav~com.eroelf~javaxsx~~~)
 
-[Maven Central Repository](http://search.maven.org/#search%7Cga%7C1%7Cjavaxsx)
+[Maven Central Repository](https://search.maven.org/search?q=javaxsx)
 
 ```
 <dependency>
@@ -47,7 +47,7 @@ doDb.close();
 ##### Batch
 
 ```java
-doDb.prepareStatement("insert into person (id, name, age, learning_subject) values (?, ?, ?, ?)");
+doDb.prepareStatement(true, "insert into person (id, name, age, learning_subject) values (?, ?, ?, ?)");
 while(...)
 {
     ...

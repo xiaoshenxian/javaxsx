@@ -1,6 +1,6 @@
 package com.eroelf.javaxsx.util.geo;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * Provides APIs for converting coordinates under China geographic coordinate reference systems.

@@ -1,10 +1,15 @@
 package com.eroelf.javaxsx.util.index;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * Maintains objects which are under a given key (the index).
@@ -28,12 +33,29 @@ public class Index<K, V>
 		public Iterable<K> getKeys(V v);
 	}
 
-	private Map<K, Set<V>> indexMap=new HashMap<>();
+	protected Map<K, Set<V>> indexMap;
+	protected boolean concurrent;
+	protected Supplier<Set<V>> setFactory;
+
+	public Index(boolean concurrent)
+	{
+		this.concurrent=concurrent;
+		if(concurrent)
+		{
+			indexMap=new ConcurrentHashMap<>();
+			setFactory=() -> Collections.newSetFromMap(new ConcurrentHashMap<V, Boolean>());
+		}
+		else
+		{
+			indexMap=new HashMap<>();
+			setFactory=HashSet::new;
+		}
+	}
 
 	public void addItem(K key, V item)
 	{
 		if(!indexMap.containsKey(key))
-			indexMap.put(key, new HashSet<>());
+			indexMap.put(key, setFactory.get());
 		indexMap.get(key).add(item);
 	}
 
@@ -74,6 +96,23 @@ public class Index<K, V>
 	public void removeIdx(K key)
 	{
 		indexMap.remove(key);
+	}
+
+	public void removeItem(V item)
+	{
+		Iterator<Entry<K, Set<V>>> entryIter=indexMap.entrySet().iterator();
+		while(entryIter.hasNext())
+		{
+			Entry<K, Set<V>> entry=entryIter.next();
+			entry.getValue().remove(item);
+			if(entry.getValue().isEmpty())
+				entryIter.remove();
+		}
+	}
+
+	public boolean isEmpty()
+	{
+		return indexMap.isEmpty();
 	}
 
 	public Set<V> get(Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)

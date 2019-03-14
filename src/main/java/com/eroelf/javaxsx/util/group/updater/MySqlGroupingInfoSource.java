@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import com.eroelf.javaxsx.util.group.ConfigInfo;
@@ -44,9 +45,9 @@ public class MySqlGroupingInfoSource extends AbstractSimpleDbGroupingInfoSource
 	}
 
 	@Override
-	protected String retrieveLastModifiedTime(ResultSet resultSet) throws SQLException
+	protected Date retrieveLastModifiedTime(ResultSet resultSet) throws SQLException
 	{
-		return resultSet.getString("update_time");
+		return resultSet.getDate("update_time");
 	}
 
 	@Override
@@ -61,7 +62,7 @@ public class MySqlGroupingInfoSource extends AbstractSimpleDbGroupingInfoSource
 		if(useRegex && facetNames.length>0)
 		{
 			if(facetNames.length==1)
-				return doDb.fromQuery(ConfigInfo.class, false, true, String.format("select * from %s where facet_name regexp ?", groupingTableName()), facetNames[0]);
+				return doDb.fromQuery(ConfigInfo.class, false, true, String.format("select facet_name, suffix, group_str, sections, update_time from %s where facet_name regexp ?", groupingTableName()), facetNames[0]);
 			else
 				throw new IllegalArgumentException("facetNames.length must be 1 when using regex!");
 		}

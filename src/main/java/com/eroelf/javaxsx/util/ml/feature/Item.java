@@ -10,7 +10,7 @@ import com.eroelf.javaxsx.util.ml.feature.score.Scoreable;
  * 
  * @author weikun.zhong
  */
-public abstract class Item extends Scoreable implements Modelable
+public abstract class Item extends Scoreable implements Modelable, UpdatableByItem<Item>
 {
 	public abstract double getFeature(int idx);
 	public abstract void setFeature(int idx, double value);
@@ -38,6 +38,16 @@ public abstract class Item extends Scoreable implements Modelable
 		public int getIdx();
 		public double getFeature();
 	}
+
+	@Override
+	public void update(Item item)
+	{
+		for(IndexedFeature indexedFeature : item.getValidFeatures())
+		{
+			setFeature(indexedFeature.getIdx(), indexedFeature.getFeature());
+		}
+	}
+
 	public abstract Iterator<IndexedFeature> validFeatureIterator();
 	public abstract Iterable<IndexedFeature> getValidFeatures();
 }

@@ -7,6 +7,7 @@ import java.util.function.ToDoubleFunction;
  * 
  * @author weikun.zhong
  */
+@FunctionalInterface
 public interface Scorer extends ToDoubleFunction<Scoreable>
 {
 	public double score(Scoreable scoreable);

@@ -2,6 +2,7 @@ package com.eroelf.javaxsx.util.ml.flow.estimate;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.eroelf.javaxsx.util.ml.feature.BatchSample;
 import com.eroelf.javaxsx.util.ml.feature.BatchScoreableRestrictedBatchSample;
@@ -10,7 +11,6 @@ import com.eroelf.javaxsx.util.ml.feature.RestrictedBatchSample;
 import com.eroelf.javaxsx.util.ml.feature.model.Modeler;
 import com.eroelf.javaxsx.util.ml.feature.score.Scorer;
 import com.eroelf.javaxsx.util.ml.flow.controller.EnumerableFlowHandler;
-import com.eroelf.javaxsx.util.ml.flow.controller.filter.ItemFilter;
 import com.eroelf.javaxsx.util.ml.flow.controller.filter.ItemFilterHandler;
 import com.eroelf.javaxsx.util.ml.flow.controller.filter.NaiveItemFilterHandler;
 import com.eroelf.javaxsx.util.ml.flow.estimate.statistics.IdleItemGroupStatistics;
@@ -87,8 +87,8 @@ public abstract class EnumerableItemGenerator<T extends Item> implements ItemGen
 		int start=destination.size();
 
 		ItemFilterHandler<T> filterHandler=getFilterHandler();
-		ItemFilter<T> preFilter=filterHandler.getPreFilter();
-		ItemFilter<T> innerFilter=filterHandler.getInnerFilter();
+		Predicate<T> preFilter=filterHandler.getPreFilter();
+		Predicate<T> innerFilter=filterHandler.getInnerFilter();
 
 		EnumerableFlowHandler<T> flowHandler=getFlowHandler();
 		Modeler modeler=flowHandler.getModeler();
@@ -139,7 +139,7 @@ public abstract class EnumerableItemGenerator<T extends Item> implements ItemGen
 		}
 
 		itemGroupStatistics.computeStatistics(destination.subList(start, destination.size()));
-		ItemFilter<T> afterFilter=filterHandler.getAfterFilter(itemGroupStatistics);
+		Predicate<T> afterFilter=filterHandler.getAfterFilter(itemGroupStatistics);
 		if(afterFilter!=null)
 		{
 			Iterator<T> iter=destination.listIterator(start);

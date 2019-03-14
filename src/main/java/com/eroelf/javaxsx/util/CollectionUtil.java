@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 /**
@@ -181,5 +183,118 @@ public class CollectionUtil
 		{
 			des.add(entry.getValue());
 		}
+	}
+
+	/**
+	 * Check if the given map contains the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * 
+	 * @param map the object to check.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return {@code true} if all {@code keys} are contained by the {@code map} in the nested form defined by the {@code keys}' order, otherwise {@code false}.
+	 */
+	public static boolean nestedContainsKeys(Object map, String... keys)
+	{
+	    for(String key : keys)
+		{
+			if(map instanceof Map && ((Map<?, ?>)map).containsKey(key))
+				map=((Map<?, ?>)map).get(key);
+			else
+				return false;
+		}
+	    return true;
+	}
+
+	/**
+	 * Find the first N "minimal" elements of the given {@code iterable} by using a {@link PriorityQueue}.
+	 * The "minimal" strategy is defined by the elements' natural order.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param iterable an {@link Iterable} object to retrieve elements.
+	 * @param num the number of "minimal" elements to be retrieving. The returned {@link PriorityQueue} object will contain all the elements if the {@code iterable} has elements less than the given {@code num}.
+	 * @return a {@link PriorityQueue} instance containing the first N "minimal" elements.
+	 */
+	public static <T extends Comparable<T>> PriorityQueue<T> minimalN(Iterable<T> iterable, int num)
+	{
+		return minimalN(iterable.iterator(), num);
+	}
+
+	/**
+	 * Find the first N "minimal" elements of the given {@code iterator} by using a {@link PriorityQueue}.
+	 * The "minimal" strategy is defined by the elements' natural order.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param iterator an {@link Iterator} object to retrieve elements.
+	 * @param num the number of "minimal" elements to be retrieving. The returned {@link PriorityQueue} object will contain all the elements if the {@code iterator} has elements less than the given {@code num}.
+	 * @return a {@link PriorityQueue} instance containing the first N "minimal" elements.
+	 */
+	public static <T extends Comparable<T>> PriorityQueue<T> minimalN(Iterator<T> iterator, int num)
+	{
+		return minimalN(iterator, num, Comparator.naturalOrder());
+	}
+
+	/**
+	 * Find the first N "minimal" elements of the given {@code iterable} by using a {@link PriorityQueue}.
+	 * The "minimal" strategy is defined by the given {@code comparator}.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param iterable an {@link Iterable} object to retrieve elements.
+	 * @param num the number of "minimal" elements to be retrieving. The returned {@link PriorityQueue} object will contain all the elements if the {@code iterable} has elements less than the given {@code num}.
+	 * @param comparator the {@link Comparator} object defining the "minimal" strategy.
+	 * @return a {@link PriorityQueue} instance containing the first N "minimal" elements.
+	 */
+	public static <T> PriorityQueue<T> minimalN(Iterable<T> iterable, int num, Comparator<T> comparator)
+	{
+		return minimalN(iterable.iterator(), num, comparator);
+	}
+
+	/**
+	 * Find the first N "minimal" elements of the given {@code iterator} by using a {@link PriorityQueue}.
+	 * The "minimal" strategy is defined by the given {@code comparator}.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param iterator an {@link Iterator} object to retrieve elements.
+	 * @param num the number of "minimal" elements to be retrieving. The returned {@link PriorityQueue} object will contain all the elements if the {@code iterator} has elements less than the given {@code num}.
+	 * @param comparator the {@link Comparator} object defining the "minimal" strategy.
+	 * @return a {@link PriorityQueue} instance containing the first N "minimal" elements.
+	 */
+	public static <T> PriorityQueue<T> minimalN(Iterator<T> iterator, int num, Comparator<T> comparator)
+	{
+		PriorityQueue<T> heap=new PriorityQueue<>(num+1, Collections.reverseOrder(comparator));
+		while(iterator.hasNext())
+		{
+			heap.add(iterator.next());
+			if(heap.size()>num)
+				heap.remove();
+		}
+		return heap;
+	}
+
+	/**
+	 * Get an {@link Iterator} instance that iterates the {@code heap} elements in the order defined by the {@code heap}'s {@link Comparator} object.
+	 * 
+	 * @param <T> the element type of the given {@code heap}.
+	 * 
+	 * @param heap the heap to be retrieve elements.
+	 * @return the {@link Iterator} instance.
+	 */
+	public static <T> Iterator<T> deheap(PriorityQueue<T> heap)
+	{
+		return new Iterator<T>() {
+			@Override
+			public boolean hasNext()
+			{
+				return !heap.isEmpty();
+			}
+
+			@Override
+			public T next()
+			{
+				return heap.remove();
+			}
+		};
 	}
 }

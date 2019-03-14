@@ -1,8 +1,10 @@
 package com.eroelf.javaxsx.util.index;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.eroelf.javaxsx.util.index.Index.KeyIter;
 import com.eroelf.javaxsx.util.index.Index.KeyMapping;
@@ -16,15 +18,21 @@ import com.eroelf.javaxsx.util.index.Index.KeyMapping;
  */
 public class IndexGroup<V>
 {
-	private static final Index<?, ?> IDLE_INDEX=new Index<>();
+	private static final Index<?, ?> IDLE_INDEX=new Index<>(false);
 
-	private Map<String, Index<?, V>> groupMap=new HashMap<>();
+	protected Map<String, Index<?, V>> groupMap=new HashMap<>();
+	protected boolean concurrent;
+
+	public IndexGroup(boolean concurrent)
+	{
+		this.concurrent=concurrent;
+	}
 
 	@SuppressWarnings("unchecked")
 	public <K> void addItem(String groupName, K key, V item)
 	{
 		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>());
+			groupMap.put(groupName, new Index<K, V>(concurrent));
 		((Index<K, V>)groupMap.get(groupName)).addItem(key, item);
 	}
 
@@ -32,7 +40,7 @@ public class IndexGroup<V>
 	public <K> void addItem(String groupName, V item, KeyMapping<K, V> keyMapping)
 	{
 		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>());
+			groupMap.put(groupName, new Index<K, V>(concurrent));
 		((Index<K, V>)groupMap.get(groupName)).addItem(item, keyMapping);
 	}
 
@@ -40,7 +48,7 @@ public class IndexGroup<V>
 	public <K> void addItemToMultiKeys(String groupName, V item, KeyIter<K, V> keyIter)
 	{
 		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>());
+			groupMap.put(groupName, new Index<K, V>(concurrent));
 		((Index<K, V>)groupMap.get(groupName)).addItemToMultiKeys(item, keyIter);
 	}
 
@@ -48,7 +56,7 @@ public class IndexGroup<V>
 	public <K> void addItems(String groupName, Iterable<V> items, KeyMapping<K, V> keyMapping)
 	{
 		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>());
+			groupMap.put(groupName, new Index<K, V>(concurrent));
 		((Index<K, V>)groupMap.get(groupName)).addItems(items, keyMapping);
 	}
 
@@ -56,7 +64,7 @@ public class IndexGroup<V>
 	public <K> void addItemsToMultiKeys(String groupName, Iterable<V> items, KeyIter<K, V> keyIter)
 	{
 		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>());
+			groupMap.put(groupName, new Index<K, V>(concurrent));
 		((Index<K, V>)groupMap.get(groupName)).addItemsToMultiKeys(items, keyIter);
 	}
 
@@ -68,6 +76,18 @@ public class IndexGroup<V>
 	public void removeIdx(String name)
 	{
 		groupMap.remove(name);
+	}
+
+	public void removeItem(V item)
+	{
+		Iterator<Entry<String, Index<?, V>>> entryIter=groupMap.entrySet().iterator();
+		while(entryIter.hasNext())
+		{
+			Entry<String, Index<?, V>> entry=entryIter.next();
+			entry.getValue().removeItem(item);
+			if(entry.getValue().isEmpty())
+				entryIter.remove();
+		}
 	}
 
 	public Index<?, V> getIdx(String name)

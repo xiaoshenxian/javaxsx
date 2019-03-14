@@ -146,6 +146,34 @@ public class ArrayUtil
 	}
 
 	/**
+	 * Get the shape of the input array.
+	 * The element of the array will be regarded as the shallow-most-non-array object, or empty.
+	 * 
+	 * @param obj the input array.
+	 * @return the shape of the input array.
+	 */
+	public static int[] getShape(Object obj)
+	{
+		List<Integer> li=new ArrayList<>();
+		while(obj.getClass().isArray())
+		{
+			int len=Array.getLength(obj);
+			li.add(len);
+			if(len>0)
+				obj=Array.get(obj, 0);
+			else
+				break;
+		}
+		int[] shape=new int[li.size()];
+		int i=0;
+		for(int x : li)
+		{
+			shape[i++]=x;
+		}
+		return shape;
+	}
+
+	/**
 	 * Calculate the element size of each dimensions and its higher dimensions of the given {@code shape}, called facet here.
 	 * In other word, the product of the shape components which indices are greater or equal to the current dimension index.
 	 * 
