@@ -11,13 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * Some APIs for containers.
  * 
  * @author weikun.zhong
  */
-public class CollectionUtil
+public final class CollectionUtil
 {
 	/**
 	 * Put all elements that both collection c1 and collection c2 has into the retainedCollection, maintaining both c1 and c2 unchanged.
@@ -192,16 +193,16 @@ public class CollectionUtil
 	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
 	 * @return {@code true} if all {@code keys} are contained by the {@code map} in the nested form defined by the {@code keys}' order, otherwise {@code false}.
 	 */
-	public static boolean nestedContainsKeys(Object map, String... keys)
+	public static boolean nestedContainsKeys(Object map, Object... keys)
 	{
-	    for(String key : keys)
+		for(Object key : keys)
 		{
 			if(map instanceof Map && ((Map<?, ?>)map).containsKey(key))
 				map=((Map<?, ?>)map).get(key);
 			else
 				return false;
 		}
-	    return true;
+		return true;
 	}
 
 	/**
@@ -296,5 +297,56 @@ public class CollectionUtil
 				return heap.remove();
 			}
 		};
+	}
+
+	public static <T extends Collection<E>, E> T toCollection(Supplier<T> creator, Iterable<E> iterable)
+	{
+		return toCollection(creator, iterable.iterator());
+	}
+
+	public static <T extends Collection<E>, E> T toCollection(Supplier<T> creator, Iterator<E> iter)
+	{
+		T res=creator.get();
+		while(iter.hasNext())
+			res.add(iter.next());
+		return res;
+	}
+
+	public static <T extends Map<K, V>, K, V> T toMap(Supplier<T> creator, Iterable<K> keyIterable, Iterable<V> valueIterable)
+	{
+		return toMap(creator, keyIterable.iterator(), valueIterable.iterator());
+	}
+
+	public static <T extends Map<K, V>, K, V> T toMap(Supplier<T> creator, Iterator<K> keyIter, Iterator<V> valueIter)
+	{
+		T map=creator.get();
+		while(keyIter.hasNext() && valueIter.hasNext())
+			map.put(keyIter.next(), valueIter.next());
+		return map;
+	}
+
+	public static <T extends Map<K, V>, K, V> T toMap(Supplier<T> creator, Iterable<Entry<K, V>> iterable)
+	{
+		return toMap(creator, iterable.iterator());
+	}
+
+	public static <T extends Map<K, V>, K, V> T toMap(Supplier<T> creator, Iterator<Entry<K, V>> iter)
+	{
+		T map=creator.get();
+		while(iter.hasNext())
+		{
+			Entry<K, V> entry=iter.next();
+			map.put(entry.getKey(), entry.getValue());
+		}
+		return map;
+	}
+
+	private CollectionUtil()
+	{}
+
+	@Override
+	public CollectionUtil clone()
+	{
+		throw new UnsupportedOperationException("This method is not allowed!");
 	}
 }

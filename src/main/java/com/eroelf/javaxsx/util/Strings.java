@@ -504,6 +504,6 @@ public final class Strings
 	@Override
 	public Strings clone()
 	{
-		throw new UnsupportedOperationException("This method is not allowed.");
+		throw new UnsupportedOperationException("This method is not allowed!");
 	}
 }

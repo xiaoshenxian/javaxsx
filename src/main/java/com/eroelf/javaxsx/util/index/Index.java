@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -21,25 +22,16 @@ import java.util.function.Supplier;
  */
 public class Index<K, V>
 {
-	@FunctionalInterface
-	public static interface KeyMapping<K, V>
-	{
-		public K getKey(V v);
-	}
-
-	@FunctionalInterface
-	public static interface KeyIter<K, V>
-	{
-		public Iterable<K> getKeys(V v);
-	}
-
 	protected Map<K, Set<V>> indexMap;
-	protected boolean concurrent;
 	protected Supplier<Set<V>> setFactory;
+
+	public Index(Supplier<Set<V>> setFactory)
+	{
+		this.setFactory=setFactory;
+	}
 
 	public Index(boolean concurrent)
 	{
-		this.concurrent=concurrent;
 		if(concurrent)
 		{
 			indexMap=new ConcurrentHashMap<>();
@@ -54,25 +46,37 @@ public class Index<K, V>
 
 	public void addItem(K key, V item)
 	{
-		if(!indexMap.containsKey(key))
-			indexMap.put(key, setFactory.get());
-		indexMap.get(key).add(item);
+		Set<V> set=indexMap.get(key);
+		if(set==null)
+		{
+			set=setFactory.get();
+			indexMap.put(key, set);
+		}
+		set.add(item);
 	}
 
-	public void addItem(V item, KeyMapping<K, V> keyMapping)
+	public void addItem(V item, Function<V, K> keyMapping)
 	{
-		addItem(keyMapping.getKey(item), item);
+		addItem(keyMapping.apply(item), item);
 	}
 
-	public void addItemToMultiKeys(V item, KeyIter<K, V> keyIter)
+	public void addItemToMultiKeys(V item, Function<V, Iterable<K>> keyIter)
 	{
-		for(K key : keyIter.getKeys(item))
+		for(K key : keyIter.apply(item))
 		{
 			addItem(key, item);
 		}
 	}
 
-	public void addItems(Iterable<V> items, KeyMapping<K, V> keyMapping)
+	public void addItems(K key, Iterable<V> items)
+	{
+		for(V item : items)
+		{
+			addItem(key, item);
+		}
+	}
+
+	public void addItems(Iterable<V> items, Function<V, K> keyMapping)
 	{
 		for(V item : items)
 		{
@@ -80,7 +84,7 @@ public class Index<K, V>
 		}
 	}
 
-	public void addItemsToMultiKeys(Iterable<V> items, KeyIter<K, V> keyIter)
+	public void addItemsToMultiKeys(Iterable<V> items, Function<V, Iterable<K>> keyIter)
 	{
 		for(V item : items)
 		{
@@ -88,14 +92,41 @@ public class Index<K, V>
 		}
 	}
 
-	public void addIdx(K key, Set<V> values)
+	public void addAll(Index<K, V> index)
 	{
-		indexMap.put(key, values);
+		for(Entry<K, Set<V>> entry : index.indexMap.entrySet())
+		{
+			addItems(entry.getKey(), entry.getValue());
+		}
 	}
 
-	public void removeIdx(K key)
+	public Set<V> putIdx(K key, Iterable<V> items)
 	{
-		indexMap.remove(key);
+		Set<V> set=setFactory.get();
+		if(items!=null)
+		{
+			for(V item : items)
+			{
+				set.add(item);
+			}
+		}
+		return indexMap.put(key, set);
+	}
+
+	public Set<V> removeIdx(K key)
+	{
+		return indexMap.remove(key);
+	}
+
+	public void removeFromIdx(K key, V item)
+	{
+		Set<V> set=indexMap.get(key);
+		if(set!=null)
+		{
+			set.remove(item);
+			if(set.isEmpty())
+				indexMap.remove(key);
+		}
 	}
 
 	public void removeItem(V item)
@@ -113,6 +144,11 @@ public class Index<K, V>
 	public boolean isEmpty()
 	{
 		return indexMap.isEmpty();
+	}
+
+	public Set<K> getKeys()
+	{
+		return new HashSet<>(indexMap.keySet());
 	}
 
 	public Set<V> get(Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
@@ -183,16 +219,16 @@ public class Index<K, V>
 		return res;
 	}
 
-	public Set<V> remove(Set<V> res, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	public Set<V> subtract(Set<V> res, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
 	{
 		if(keyIter!=null)
-			_remove(res, keyIter);
+			_subtract(res, keyIter);
 		if(keys.length>0)
-			_remove(res, Arrays.asList(keys));
+			_subtract(res, Arrays.asList(keys));
 		return res;
 	}
 
-	protected Set<V> _remove(Set<V> res, Iterable<K> keyIter)
+	protected Set<V> _subtract(Set<V> res, Iterable<K> keyIter)
 	{
 		if(!indexMap.isEmpty())
 		{

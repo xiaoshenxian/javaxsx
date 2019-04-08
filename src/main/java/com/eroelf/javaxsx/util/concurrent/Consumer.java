@@ -69,6 +69,11 @@ public class Consumer<T> implements java.util.function.Consumer<T>, Runnable
 		this.loggerFunc=loggerFunc;
 	}
 
+	public void setConsumeFunc(java.util.function.Consumer<T> consumeFunc)
+	{
+		this.consumeFunc=consumeFunc;
+	}
+
 	@Override
 	public void run()
 	{

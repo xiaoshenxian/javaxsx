@@ -80,11 +80,15 @@ public abstract class UpdateTask<E, T>
 				updaterInit(dbUpdater);
 				dbUpdaterList.add(dbUpdater);
 			}
-			catch(SQLException e)
+			catch(Exception e)
 			{
 				loggerFunc.accept(e, "UpdateTask::consume: Initialize faild! This dbUpdater will be dropped!");
 			}
 		}
+
+		if(dbUpdaterList.isEmpty())
+			throw new IllegalArgumentException("UpdateTask::consume: no valid dbUpdater!");
+
 		long elemCount=0;
 		if(elemAt==null)
 			elemAt=c -> true;
@@ -174,6 +178,9 @@ public abstract class UpdateTask<E, T>
 			}
 		}
 
+		if(consumers.isEmpty())
+			throw new IllegalArgumentException("UpdateTask::consume: no valid dbUpdater!");
+
 		return (elemAt!=null ? new ProducerConsumer(loggerFunc) {
 			@Override
 			protected boolean elemAt(long elemCount)
@@ -222,9 +229,10 @@ public abstract class UpdateTask<E, T>
 		{
 			dbUpdater.prepare();
 		}
-		finally
+		catch(Exception e)
 		{
 			dbUpdater.close();
+			throw e;
 		}
 	}
 
@@ -232,15 +240,19 @@ public abstract class UpdateTask<E, T>
 	{
 		try
 		{
-			for(Object[] dt : dbUpdater.process(data))
+			Iterable<Object[]> iter=dbUpdater.process(data);
+			if(iter!=null)
 			{
-				try
+				for(Object[] dt : iter)
 				{
-					dbUpdater.accept(dt);
-				}
-				catch(Exception e)
-				{
-					loggerFunc.accept(e, "UpdateTask::updaterConsume: dbUpdater.accept exception!");
+					try
+					{
+						dbUpdater.accept(dt);
+					}
+					catch(Exception e)
+					{
+						loggerFunc.accept(e, "UpdateTask::updaterConsume: dbUpdater.accept exception!");
+					}
 				}
 			}
 		}

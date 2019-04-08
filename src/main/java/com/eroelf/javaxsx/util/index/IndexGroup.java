@@ -1,13 +1,14 @@
 package com.eroelf.javaxsx.util.index;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import com.eroelf.javaxsx.util.index.Index.KeyIter;
-import com.eroelf.javaxsx.util.index.Index.KeyMapping;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Maintains a group of indices for a number of objects.
@@ -21,61 +22,155 @@ public class IndexGroup<V>
 	private static final Index<?, ?> IDLE_INDEX=new Index<>(false);
 
 	protected Map<String, Index<?, V>> groupMap=new HashMap<>();
-	protected boolean concurrent;
+	protected Supplier<Index<?, V>> indexFactory;
+
+	public IndexGroup(Map<String, Index<?, V>> groupMap, Supplier<Index<?, V>> indexFactory)
+	{
+		this.groupMap=groupMap;
+		this.indexFactory=indexFactory;
+	}
 
 	public IndexGroup(boolean concurrent)
 	{
-		this.concurrent=concurrent;
+		this.indexFactory=() -> new Index<>(concurrent);
+		if(concurrent)
+			groupMap=new ConcurrentHashMap<>();
+		else
+			groupMap=new HashMap<>();
 	}
 
 	@SuppressWarnings("unchecked")
 	public <K> void addItem(String groupName, K key, V item)
 	{
-		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>(concurrent));
-		((Index<K, V>)groupMap.get(groupName)).addItem(key, item);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItem(key, item);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> void addItem(String groupName, V item, KeyMapping<K, V> keyMapping)
+	public <K> void addItem(String groupName, V item, Function<V, K> keyMapping)
 	{
-		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>(concurrent));
-		((Index<K, V>)groupMap.get(groupName)).addItem(item, keyMapping);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItem(item, keyMapping);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> void addItemToMultiKeys(String groupName, V item, KeyIter<K, V> keyIter)
+	public <K> void addItemToMultiKeys(String groupName, V item, Function<V, Iterable<K>> keyIter)
 	{
-		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>(concurrent));
-		((Index<K, V>)groupMap.get(groupName)).addItemToMultiKeys(item, keyIter);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItemToMultiKeys(item, keyIter);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> void addItems(String groupName, Iterable<V> items, KeyMapping<K, V> keyMapping)
+	public <K> void addItems(String groupName, K key, Iterable<V> items)
 	{
-		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>(concurrent));
-		((Index<K, V>)groupMap.get(groupName)).addItems(items, keyMapping);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItems(key, items);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> void addItemsToMultiKeys(String groupName, Iterable<V> items, KeyIter<K, V> keyIter)
+	public <K> void addItems(String groupName, Iterable<V> items, Function<V, K> keyMapping)
 	{
-		if(!groupMap.containsKey(groupName))
-			groupMap.put(groupName, new Index<K, V>(concurrent));
-		((Index<K, V>)groupMap.get(groupName)).addItemsToMultiKeys(items, keyIter);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItems(items, keyMapping);
 	}
 
-	public void addIdx(String name, Index<?, V> index)
+	@SuppressWarnings("unchecked")
+	public <K> void addItemsToMultiKeys(String groupName, Iterable<V> items, Function<V, Iterable<K>> keyIter)
 	{
-		groupMap.put(name, index);
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index==null)
+		{
+			index=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, index);
+		}
+		index.addItemsToMultiKeys(items, keyIter);
 	}
 
-	public void removeIdx(String name)
+	@SuppressWarnings("unchecked")
+	public <K> void addIndex(String groupName, Index<K, V> index)
 	{
-		groupMap.remove(name);
+		Index<K, V> idx=(Index<K, V>)groupMap.get(groupName);
+		if(idx==null)
+		{
+			idx=(Index<K, V>)indexFactory.get();
+			groupMap.put(groupName, idx);
+		}
+		idx.addAll(index);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <KO, KN> Index<KO, V> putIndex(String groupName, Index<KN, V> index)
+	{
+		Index<KN, V> idx=(Index<KN, V>)indexFactory.get();
+		if(index!=null)
+			idx.addAll(index);
+		return (Index<KO, V>)groupMap.put(groupName, idx);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> Index<K, V> removeIndex(String groupName)
+	{
+		return (Index<K, V>)groupMap.remove(groupName);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> void removeIndexIdx(String groupName, K key)
+	{
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index!=null)
+		{
+			index.removeIdx(key);
+			if(index.isEmpty())
+				groupMap.remove(groupName);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> void removeFromIndexIdx(String groupName, K key, V item)
+	{
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
+		if(index!=null)
+		{
+			index.removeFromIdx(key, item);
+			if(index.isEmpty())
+				groupMap.remove(groupName);
+		}
+	}
+
+	public void removeIndexItem(String groupName, V item)
+	{
+		Index<?, V> index=groupMap.get(groupName);
+		if(index!=null)
+		{
+			index.removeItem(item);
+			if(index.isEmpty())
+				groupMap.remove(groupName);
+		}
 	}
 
 	public void removeItem(V item)
@@ -90,45 +185,57 @@ public class IndexGroup<V>
 		}
 	}
 
-	public Index<?, V> getIdx(String name)
+	public Set<String> getGroupNames()
 	{
-		return groupMap.get(name);
+		return new HashSet<>(groupMap.keySet());
 	}
 
-	public <K> Set<V> get(String name, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	public <K> Set<K> getIndexKeys(String groupName)
 	{
-		Index<K, V> idx=getNotNullIdx(name);
-		return idx.get(keyIter, keys);
-	}
-
-	public <K> Set<V> intersect(Set<V> res, String name, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
-	{
-		Index<K, V> idx=getNotNullIdx(name);
-		return idx.intersect(res, keyIter, keys);
-	}
-
-	public <K> Set<V> union(Set<V> res, String name, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
-	{
-		Index<K, V> idx=getNotNullIdx(name);
-		return idx.union(res, keyIter, keys);
-	}
-
-	public <K> Set<V> intersectUnion(Set<V> res, String name, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
-	{
-		Index<K, V> idx=getNotNullIdx(name);
-		return idx.intersectUnion(res, keyIter, keys);
-	}
-
-	public <K> Set<V> remove(Set<V> res, String name, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
-	{
-		Index<K, V> idx=getNotNullIdx(name);
-		return idx.remove(res, keyIter, keys);
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.getKeys();
 	}
 
 	@SuppressWarnings("unchecked")
-	public <K> Index<K, V> getNotNullIdx(String name)
+	public <K> Index<K, V> getIndex(String groupName)
 	{
-		Index<K, V> index=(Index<K, V>)groupMap.get(name);
+		return (Index<K, V>)groupMap.get(groupName);
+	}
+
+	public <K> Set<V> get(String groupName, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	{
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.get(keyIter, keys);
+	}
+
+	public <K> Set<V> intersect(Set<V> res, String groupName, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	{
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.intersect(res, keyIter, keys);
+	}
+
+	public <K> Set<V> union(Set<V> res, String groupName, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	{
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.union(res, keyIter, keys);
+	}
+
+	public <K> Set<V> intersectUnion(Set<V> res, String groupName, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	{
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.intersectUnion(res, keyIter, keys);
+	}
+
+	public <K> Set<V> subtract(Set<V> res, String groupName, Iterable<K> keyIter, @SuppressWarnings("unchecked") K... keys)
+	{
+		Index<K, V> index=getNotNullIdx(groupName);
+		return index.subtract(res, keyIter, keys);
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <K> Index<K, V> getNotNullIdx(String groupName)
+	{
+		Index<K, V> index=(Index<K, V>)groupMap.get(groupName);
 		if(index!=null)
 			return index;
 		else

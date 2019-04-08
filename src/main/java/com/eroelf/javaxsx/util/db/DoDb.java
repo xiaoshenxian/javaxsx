@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
@@ -363,12 +364,15 @@ public class DoDb implements AutoCloseable
 					private Method[] methods;
 					private int[] methodIdx;
 
+					private boolean nextFlag=false;
+
 					@Override
 					public boolean hasNext()
 					{
 						try
 						{
-							return resultSet.next();
+							nextFlag=resultSet.next();
+							return nextFlag;
 						}
 						catch(SQLException e)
 						{
@@ -379,6 +383,11 @@ public class DoDb implements AutoCloseable
 					@Override
 					public T next()
 					{
+						if(nextFlag)
+							nextFlag=false;
+						else
+							throw new NoSuchElementException();
+
 						try
 						{
 							if(first)
