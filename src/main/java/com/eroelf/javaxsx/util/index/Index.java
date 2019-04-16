@@ -1,5 +1,6 @@
 package com.eroelf.javaxsx.util.index;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,10 +21,12 @@ import java.util.function.Supplier;
  * @param <K> the object type of the index key.
  * @param <V> the object type of the index value.
  */
-public class Index<K, V>
+public class Index<K, V> implements Serializable
 {
+	private static final long serialVersionUID=5287011192325259476L;
+
 	protected Map<K, Set<V>> indexMap;
-	protected Supplier<Set<V>> setFactory;
+	protected transient Supplier<Set<V>> setFactory;
 
 	public Index(Supplier<Set<V>> setFactory)
 	{
@@ -42,6 +45,11 @@ public class Index<K, V>
 			indexMap=new HashMap<>();
 			setFactory=HashSet::new;
 		}
+	}
+
+	public void setSetFactory(Supplier<Set<V>> setFactory)
+	{
+		this.setFactory=setFactory;
 	}
 
 	public void addItem(K key, V item)

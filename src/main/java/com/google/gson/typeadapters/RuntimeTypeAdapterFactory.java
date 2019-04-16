@@ -160,7 +160,7 @@ import com.google.gson.stream.JsonWriter;
  * }
  * </pre>
  */
-public final class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
+public class RuntimeTypeAdapterFactory<T> implements TypeAdapterFactory
 {
 	private final Class<?> baseType;
 	private final String typeFieldName;

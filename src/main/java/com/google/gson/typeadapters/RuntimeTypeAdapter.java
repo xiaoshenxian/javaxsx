@@ -144,7 +144,7 @@ import java.util.Map;
  * }
  * </pre>
  */
-public final class RuntimeTypeAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T>
+public class RuntimeTypeAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T>
 {
 	private final Class<?> baseType;
 	private final String typeFieldName;

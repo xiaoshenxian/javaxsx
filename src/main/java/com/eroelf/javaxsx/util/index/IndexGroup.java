@@ -1,5 +1,6 @@
 package com.eroelf.javaxsx.util.index;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,12 +18,14 @@ import java.util.function.Supplier;
  *
  * @param <V> the object type of the index value.
  */
-public class IndexGroup<V>
+public class IndexGroup<V> implements Serializable
 {
+	private static final long serialVersionUID=-1767062789829143153L;
+
 	private static final Index<?, ?> IDLE_INDEX=new Index<>(false);
 
 	protected Map<String, Index<?, V>> groupMap=new HashMap<>();
-	protected Supplier<Index<?, V>> indexFactory;
+	protected transient Supplier<Index<?, V>> indexFactory;
 
 	public IndexGroup(Map<String, Index<?, V>> groupMap, Supplier<Index<?, V>> indexFactory)
 	{
@@ -37,6 +40,11 @@ public class IndexGroup<V>
 			groupMap=new ConcurrentHashMap<>();
 		else
 			groupMap=new HashMap<>();
+	}
+
+	public void setIndexFactory(Supplier<Index<?, V>> indexFactory)
+	{
+		this.indexFactory=indexFactory;
 	}
 
 	@SuppressWarnings("unchecked")
