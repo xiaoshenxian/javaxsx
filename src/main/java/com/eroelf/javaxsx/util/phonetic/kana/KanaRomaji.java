@@ -69,15 +69,31 @@ public class KanaRomaji
 			String curr=KANA_TO_ROMAJI.get(ch);
 			if(curr==null)
 			{
+				String bufferStr=buffer.toString();
 				if(buffer.length()>0)
 				{
-					buildRomaji(res, buffer, curr, prolong, useHebon);
+					buildRomaji(res, bufferStr, curr, prolong, useHebon);
 					buffer.delete(0, buffer.length());
 				}
 				else if(lastChar=='っ' || lastChar=='ッ')
 					res.add(checkHebon(KANA_TO_ROMAJI.get(lastChar), useHebon));
 				prolong=false;
-				res.add(String.valueOf(ch));
+				if(ch=='ー')
+					res.add("\u0304");
+				else if(ch=='・')
+					res.add("·");
+				else if(ch=='ゝ' || ch=='ヽ')
+				{
+					if(!bufferStr.isEmpty())
+						buildRomaji(res, devoice(bufferStr), curr, prolong, useHebon);
+				}
+				else if(ch=='ゞ' || ch=='ヾ')
+				{
+					if(!bufferStr.isEmpty())
+						buildRomaji(res, voice(bufferStr), curr, prolong, useHebon);
+				}
+				else
+					res.add(String.valueOf(ch));
 			}
 			else
 			{
@@ -93,7 +109,7 @@ public class KanaRomaji
 					}
 					if(buffer.length()>0)
 					{
-						buildRomaji(res, buffer, curr, prolong, useHebon);
+						buildRomaji(res, buffer.toString(), curr, prolong, useHebon);
 						buffer.delete(0, buffer.length());
 						prolong=false;
 					}
@@ -106,15 +122,25 @@ public class KanaRomaji
 			lastChar=ch;
 		}
 		if(buffer.length()>0)
-			buildRomaji(res, buffer, null, prolong, useHebon);
+			buildRomaji(res, buffer.toString(), null, prolong, useHebon);
 		if(lastChar=='っ' || lastChar=='ッ')
 			res.add(checkHebon(KANA_TO_ROMAJI.get(lastChar), useHebon));
 		return res;
 	}
 
-	private static void buildRomaji(List<String> des, StringBuilder buffer, String curr, boolean prolong, boolean useHebon)
+	private static String devoice(String bufferStr)
 	{
-		String romaji=checkHebon(buffer.toString(), useHebon);
+		return bufferStr.replace('g', 'k').replace('z', 's').replace('d', 't').replace('b', 'h');
+	}
+
+	private static String voice(String bufferStr)
+	{
+		return bufferStr.replace('k', 'g').replace('s', 'z').replace('t', 'd').replace('h', 'b');
+	}
+
+	private static void buildRomaji(List<String> des, String buffer, String curr, boolean prolong, boolean useHebon)
+	{
+		String romaji=checkHebon(buffer, useHebon);
 		if(prolong)
 		{
 			if(romaji.startsWith("ch"))

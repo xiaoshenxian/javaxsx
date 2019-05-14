@@ -78,7 +78,7 @@ public abstract class Converter<T extends Item, I extends Info, L extends InfoLo
 	{
 		int validCount=0;
 		int invalidCount=0;
-		if(start<itemList.size())
+		if(start<itemList.size() && length>0)
 		{
 			ListIterator<? extends T> iter=itemList.listIterator(start);
 			while(iter.hasNext())
