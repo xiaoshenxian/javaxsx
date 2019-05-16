@@ -28,6 +28,24 @@ If a *History* is related to a subjective action, it becomes a *Behavior*. As ma
 
 *Behaviors* class defines some basic methods to deal with behaviors.
 
+#### concurrent
+
+Concurrent utilities.
+
+##### *ProducerConsumer*
+
+```java
+Iterator<Product> iterator;// The producer.
+int queueCapacity;// The capacity of the queue holding products that waiting to be consumed.
+int nThreads;// Number of consumers.
+long timeout;// Time to wait for the threads to join.
+TimeUnit unit;// The unit of timeout.
+Consumer<Product> handler=p -> System.out.println(p.toString());// Define how consumers should process those products.
+
+ProducerConsumer pc=new ProducerConsumer();
+pc.consume(iterator, queueCapacity, nThreads, timeout, unit, handler);
+```
+
 #### db
 
 Provides some simple APIs for database requests. There is **NO** support for connection pools and standing connections.
@@ -73,6 +91,28 @@ public class Person
 }
 
 List<Person> list=doDb.fromQuery(Person.class, true, true, "select id, name, age, learning_subject from person");
+```
+
+##### Database updater
+
+Provide APIs that deal with necessary working flows to update information of a database.
+
+```java
+DbUpdater<Person> dbUpdater1=new DbInserter {
+    @Override
+    public Iterable<Object[]> process(Person data)
+    {
+        return new Collection.singleton(new Object[]{data.name, data.age});
+    }
+};
+DbUpdater<Person> dbUpdater2=new DbUpdater {
+    //...
+};
+
+String inputFileName;
+Gson gson;
+UpdateTask<String, Person> task=new UpdateTask(dbUpdater1, dbUpdater2);
+task.consume(new FileIterator<String>(inputFileName).forEachRemaining(line -> gson.fromJson(line, Person.class)));
 ```
 
 #### geo
@@ -264,6 +304,10 @@ This package defines general working flows for ranking and recommendation system
   * Item, Info, and InfoLog
   
   As described above, objects of all the three classes are "products" in a specified ranking and recommendation system. *Item* class is used for back-end data, *Info* class is used for front-end data, and *InfoLog* class is used for logging necessary information for *Info* objects.
+
+#### monitor
+
+General data structure for a server monitoring.
 
 #### net
 

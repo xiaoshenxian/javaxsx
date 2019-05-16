@@ -64,14 +64,15 @@ public class KanaRomaji
 		StringBuilder buffer=new StringBuilder();
 		boolean prolong=false;
 		char lastChar=0;
+		String bufferStr="";
 		for(char ch : kana.toCharArray())
 		{
 			String curr=KANA_TO_ROMAJI.get(ch);
 			if(curr==null)
 			{
-				String bufferStr=buffer.toString();
 				if(buffer.length()>0)
 				{
+					bufferStr=buffer.toString();
 					buildRomaji(res, bufferStr, curr, prolong, useHebon);
 					buffer.delete(0, buffer.length());
 				}
@@ -109,7 +110,8 @@ public class KanaRomaji
 					}
 					if(buffer.length()>0)
 					{
-						buildRomaji(res, buffer.toString(), curr, prolong, useHebon);
+						bufferStr=buffer.toString();
+						buildRomaji(res, bufferStr, curr, prolong, useHebon);
 						buffer.delete(0, buffer.length());
 						prolong=false;
 					}
