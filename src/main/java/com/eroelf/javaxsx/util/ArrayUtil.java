@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
  * 
  * @author weikun.zhong
  */
-public class ArrayUtil
+public final class ArrayUtil
 {
 	/**
 	 * Create a new array with the given shape and element type.

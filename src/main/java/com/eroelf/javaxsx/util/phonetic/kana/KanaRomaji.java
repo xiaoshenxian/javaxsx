@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Provides simple methods to convert Japanese Kana to Romaji.
+ * 
+ * @author weikun.zhong
+ */
 public class KanaRomaji
 {
 	private static final char[] HIRAGANA="ぁあぃいぅうぇえぉおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろゎわゐゑをんゔゕゖ".toCharArray();
@@ -80,7 +85,12 @@ public class KanaRomaji
 					res.add(checkHebon(KANA_TO_ROMAJI.get(lastChar), useHebon));
 				prolong=false;
 				if(ch=='ー')
-					res.add("\u0304");
+				{
+					if(res.isEmpty())
+						res.add("\u0304");
+					else
+						res.add(res.remove(res.size()-1)+"\u0304");
+				}
 				else if(ch=='・')
 					res.add("·");
 				else if(ch=='ゝ' || ch=='ヽ')

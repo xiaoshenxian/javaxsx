@@ -13,13 +13,11 @@ import java.util.stream.StreamSupport;
 
 /**
  * This class converts an input file to an iterator whose next() method returns the processed result of each line.
- * Override {@link #processLine(String)} to process each line or just invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method.
+ * A simple usage is to invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method to process each line.
  * 
  * @author weikun.zhong
- *
- * @param <E> E is the return type of the {@link #next()} method.
  */
-public class FileIterator<E> implements Iterator<E>
+public class FileIterator implements Iterator<String>
 {
 	protected InputHelper inputHelper;
 	protected String line;
@@ -273,57 +271,43 @@ public class FileIterator<E> implements Iterator<E>
 	@Override
 	public boolean hasNext()
 	{
-		if(line!=null)
-			return true;
-		else
+		if(line==null)
 		{
 			try
 			{
 				line=br.readLine();
+				if(line!=null)
+					return true;
+				else
+				{
+					close();
+					return false;
+				}
 			}
 			catch(IOException e)
 			{
-				line=null;
 				throw new UncheckedIOException(e);
 			}
-			if(line!=null)
-				return true;
-			else
-			{
-				try
-				{
-					close();
-				}
-				catch(IOException e)
-				{
-					throw new UncheckedIOException(e);
-				}
-				return false;
-			}
 		}
+		else
+			return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public E next()
+	public String next()
 	{
 		if(line!=null || hasNext())
 		{
 			String ln=line;
 			line=null;
-			return (E)processLine(ln);
+			return ln;
 		}
 		else
 			throw new NoSuchElementException();
 	}
 
-	public Stream<E> lines()
+	public Stream<String> lines()
 	{
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED|Spliterator.NONNULL), false);
-	}
-
-	protected Object processLine(String line)
-	{
-		return line;
 	}
 }

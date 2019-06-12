@@ -43,7 +43,7 @@ public abstract class DbInserter<T> implements DbUpdater<T>
 	@Override
 	public void init() throws SQLException
 	{
-		doDb=new DoDb(DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Shanghai", dbHost, dbPort, dbName), dbUser, dbPassword));
+		doDb=new DoDb(DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai", dbHost, dbPort, dbName), dbUser, dbPassword));
 	}
 
 	@Override

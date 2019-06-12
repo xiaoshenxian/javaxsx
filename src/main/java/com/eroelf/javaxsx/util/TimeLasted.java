@@ -55,6 +55,11 @@ public class TimeLasted
 		return endNano-beginNano;
 	}
 
+	public double getLapseMilli()
+	{
+		return getLapseNano()/1e6;
+	}
+
 	public long getLapseNano()
 	{
 		return end();
@@ -63,6 +68,11 @@ public class TimeLasted
 	public String getLapse()
 	{
 		return format(end());
+	}
+
+	public double getIntervalMilli()
+	{
+		return getIntervalNano()/1e6;
 	}
 
 	public long getIntervalNano()
@@ -77,6 +87,11 @@ public class TimeLasted
 		String spanStr=getLapse();
 		start();
 		return spanStr;
+	}
+
+	public double getCurrentMilli()
+	{
+		return getCurrentNano()/1e6;
 	}
 
 	public long getCurrentNano()

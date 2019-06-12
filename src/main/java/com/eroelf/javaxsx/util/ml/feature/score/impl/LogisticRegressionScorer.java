@@ -10,6 +10,7 @@ import com.eroelf.javaxsx.util.ml.feature.Item;
 import com.eroelf.javaxsx.util.ml.feature.Item.IndexedFeature;
 import com.eroelf.javaxsx.util.ml.feature.score.Scoreable;
 import com.eroelf.javaxsx.util.ml.feature.score.Scorer;
+import com.google.common.collect.Iterators;
 
 /**
  * A logistic regression model to score {@link Item} objects.
@@ -97,27 +98,15 @@ public class LogisticRegressionScorer implements Scorer
 
 	public LogisticRegressionScorer(final String weightFile, final String mappingFile)
 	{
-		Iterator<Double> weights=new FileIterator<Double>(weightFile) {
-			@Override
-			protected Double processLine(String line)
-			{
-				return Double.parseDouble(line);
-			}
-		};
-		Iterator<String> mapping=new FileIterator<String>(mappingFile);
+		Iterator<Double> weights=Iterators.transform(new FileIterator(weightFile), Double::parseDouble);
+		Iterator<String> mapping=new FileIterator(mappingFile);
 		init(weights, mapping);
 	}
 
 	public <T> LogisticRegressionScorer(Class<T> desClass, final String weightFile, final String mappingFile)
 	{
-		Iterator<Double> weights=new FileIterator<Double>(desClass, weightFile) {
-			@Override
-			protected Double processLine(String line)
-			{
-				return Double.parseDouble(line);
-			}
-		};
-		Iterator<String> mapping=new FileIterator<String>(desClass, mappingFile);
+		Iterator<Double> weights=Iterators.transform(new FileIterator(desClass, weightFile), Double::parseDouble);
+		Iterator<String> mapping=new FileIterator(desClass, mappingFile);
 		init(weights, mapping);
 	}
 

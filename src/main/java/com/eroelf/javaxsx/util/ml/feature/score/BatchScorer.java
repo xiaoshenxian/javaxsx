@@ -1,7 +1,6 @@
 package com.eroelf.javaxsx.util.ml.feature.score;
 
 import java.util.Iterator;
-import java.util.List;
 
 import com.eroelf.javaxsx.util.ml.feature.BatchScoreableRestrictedBatchSample;
 
@@ -14,7 +13,7 @@ import com.eroelf.javaxsx.util.ml.feature.BatchScoreableRestrictedBatchSample;
  */
 public abstract class BatchScorer implements Scorer
 {
-	public abstract List<Double> getAllScores(BatchScoreableRestrictedBatchSample<?> batchSample);
+	public abstract Iterable<Double> getAllScores(BatchScoreableRestrictedBatchSample<?> batchSample);
 
 	@Override
 	public double score(Scoreable scoreable)

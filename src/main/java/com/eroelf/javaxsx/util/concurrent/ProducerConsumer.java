@@ -162,15 +162,10 @@ public class ProducerConsumer
 			try
 			{
 				elem=iterator.next();
-				if(elem!=null)
+				for(Consumer<T> consumer : consumers)
 				{
-					for(Consumer<T> consumer : consumers)
-					{
-						consumer.enqueue(elem);
-					}
+					consumer.enqueue(elem);
 				}
-				if(!elemAt(elemCount++))
-					break;
 			}
 			catch(InterruptedException e)
 			{
@@ -180,6 +175,8 @@ public class ProducerConsumer
 			{
 				loggerFunc.accept(e, "Failed to produce an element: "+String.valueOf(elem));
 			}
+			if(!elemAt(elemCount++))
+				break;
 		}
 
 		es.shutdownNow();

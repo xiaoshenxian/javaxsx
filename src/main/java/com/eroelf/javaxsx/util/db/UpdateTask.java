@@ -17,48 +17,37 @@ import com.eroelf.javaxsx.util.concurrent.ProducerConsumer;
  * Defines the working flow of a simple database updating task by using {@link DbUpdater}s to maintain database connections and updating procedures.
  * 
  * @author weikun.zhong
- *
- * @param <E> the element type of the input data.
- * @param <T> the element type of the data returned by the {@link #preprocessor(Object)} method and will be consumed by {@link DbUpdater}s.
  */
-public abstract class UpdateTask<E, T>
+public class UpdateTask
 {
-	private DbUpdater<T>[] dbUpdaters;
 	private BiConsumer<? super Exception, String> loggerFunc;
 
-	@SafeVarargs
-	public UpdateTask(DbUpdater<T>... dbUpdaters)
+	public UpdateTask()
 	{
-		this(StdLoggers.STD_ERR_EXCEPTION_MSG_LOGGER, dbUpdaters);
+		this(StdLoggers.STD_ERR_EXCEPTION_MSG_LOGGER);
 	}
 
-	@SafeVarargs
-	public UpdateTask(BiConsumer<? super Exception, String> loggerFunc, DbUpdater<T>... dbUpdaters)
+	public UpdateTask(BiConsumer<? super Exception, String> loggerFunc)
 	{
 		this.loggerFunc=loggerFunc;
-		this.dbUpdaters=dbUpdaters;
 	}
-
-	/**
-	 * Pre-processes the input data to a form that those {@link DbUpdater}s will process.
-	 * 
-	 * @param elem the input data.
-	 * @return the output data that will be passed to those {@link DbUpdater}s will process.
-	 */
-	public abstract T preprocessor(E elem);
 
 	/**
 	 * Consumes the input data provided by the {@code iter} in a single thread.
 	 * 
 	 * @param iter provide the input data.
+	 * @param dbUpdaters the database handlers to consume the data.
 	 * 
-	 * @see #consume(Iterator, Function)
-	 * @see #consume(Iterator, int, long, TimeUnit)
-	 * @see #consume(Iterator, int, long, TimeUnit, Function)
+	 * @param <T> the element type of the data provided by the {@code iter} and will be consumed by {@link DbUpdater}s.
+	 * 
+	 * @see #consume(Iterator, Function, DbUpdater...)
+	 * @see #consume(Iterator, int, long, TimeUnit, DbUpdater...)
+	 * @see #consume(Iterator, int, long, TimeUnit, Function, DbUpdater...)
 	 */
-	public void consume(Iterator<E> iter)
+	@SuppressWarnings("unchecked")
+	public <T> void consume(Iterator<T> iter, DbUpdater<T>... dbUpdaters)
 	{
-		consume(iter, null);
+		consume(iter, null, dbUpdaters);
 	}
 
 	/**
@@ -66,11 +55,15 @@ public abstract class UpdateTask<E, T>
 	 * 
 	 * @param iter provide the input data.
 	 * @param elemAt an input data count related task handler, returns {@code true} to continue to process the following data, or {@code false} to break the entire task.
+	 * @param dbUpdaters the database handlers to consume the data.
 	 * 
-	 * @see #consume(Iterator, int, long, TimeUnit)
-	 * @see #consume(Iterator, int, long, TimeUnit, Function)
+	 * @param <T> the element type of the data provided by the {@code iter} and will be consumed by {@link DbUpdater}s.
+	 * 
+	 * @see #consume(Iterator, int, long, TimeUnit, DbUpdater...)
+	 * @see #consume(Iterator, int, long, TimeUnit, Function, DbUpdater...)
 	 */
-	public void consume(Iterator<E> iter, Function<Long, Boolean> elemAt)
+	@SuppressWarnings("unchecked")
+	public <T> void consume(Iterator<T> iter, Function<Long, Boolean> elemAt, DbUpdater<T>... dbUpdaters)
 	{
 		List<DbUpdater<T>> dbUpdaterList=new ArrayList<>(dbUpdaters.length);
 		for(DbUpdater<T> dbUpdater : dbUpdaters)
@@ -94,18 +87,18 @@ public abstract class UpdateTask<E, T>
 			elemAt=c -> true;
 		while(iter.hasNext())
 		{
-			E elem=iter.next();
+			T data=null;
 			try
 			{
-				T data=preprocessor(elem);
-				for(DbUpdater<T> dbUpdater : dbUpdaterList)
-				{
-					updaterConsume(dbUpdater, data, loggerFunc);
-				}
+				data=iter.next();
 			}
 			catch(Exception e)
 			{
-				loggerFunc.accept(e, "UpdateTask::consume: preprocessor failed!");
+				loggerFunc.accept(e, "UpdateTask::consume: fetch iterator failed!");
+			}
+			for(DbUpdater<T> dbUpdater : dbUpdaterList)
+			{
+				updaterConsume(dbUpdater, data, loggerFunc);
 			}
 			if(!elemAt.apply(elemCount++))
 				break;
@@ -123,15 +116,20 @@ public abstract class UpdateTask<E, T>
 	 * @param queueCapacity cache size for each {@link DbUpdater} task.
 	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
 	 * @param unit the unit of the {@code timeout}.
+	 * @param dbUpdaters the database handlers to consume the data.
+	 * 
+	 * @param <T> the element type of the data provided by the {@code iter} and will be consumed by {@link DbUpdater}s.
+	 * 
 	 * @return {@code true} if the inner executor terminated and {@code false} if the timeout elapsed before termination.
 	 * 
 	 * @throws InterruptedException if interrupted while waiting {@link DbUpdater} tasks to be completed.
 	 * 
-	 * @see #consume(Iterator, int, long, TimeUnit, Function)
+	 * @see #consume(Iterator, int, long, TimeUnit, Function, DbUpdater...)
 	 */
-	public boolean consume(Iterator<E> iter, int queueCapacity, long timeout, TimeUnit unit) throws InterruptedException
+	@SuppressWarnings("unchecked")
+	public <T> boolean consume(Iterator<T> iter, int queueCapacity, long timeout, TimeUnit unit, DbUpdater<T>... dbUpdaters) throws InterruptedException
 	{
-		return consume(iter, queueCapacity, timeout, unit, null);
+		return consume(iter, queueCapacity, timeout, unit, null, dbUpdaters);
 	}
 
 	/**
@@ -142,6 +140,10 @@ public abstract class UpdateTask<E, T>
 	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
 	 * @param unit the unit of the {@code timeout}.
 	 * @param elemAt an input data count related task handler, returns {@code true} to continue to process the following data, or {@code false} to break the entire task.
+	 * @param dbUpdaters the database handlers to consume the data.
+	 * 
+	 * @param <T> the element type of the data provided by the {@code iter} and will be consumed by {@link DbUpdater}s.
+	 * 
 	 * @return {@code true} if the inner executor terminated and {@code false} if the timeout elapsed before termination.
 	 * 
 	 * @throws InterruptedException if interrupted while waiting {@link DbUpdater} tasks to be completed.
@@ -149,7 +151,7 @@ public abstract class UpdateTask<E, T>
 	 * @see ProducerConsumer
 	 */
 	@SuppressWarnings("unchecked")
-	public boolean consume(Iterator<E> iter, int queueCapacity, long timeout, TimeUnit unit, Function<Long, Boolean> elemAt) throws InterruptedException
+	public <T> boolean consume(Iterator<T> iter, int queueCapacity, long timeout, TimeUnit unit, Function<Long, Boolean> elemAt, DbUpdater<T>... dbUpdaters) throws InterruptedException
 	{
 		List<Consumer<T>> consumers=new ArrayList<>();
 		for(DbUpdater<T> dbUpdater : dbUpdaters)
@@ -197,11 +199,11 @@ public abstract class UpdateTask<E, T>
 				{
 					try
 					{
-						data=preprocessor(iter.next());
+						data=iter.next();
 					}
 					catch(Exception e)
 					{
-						loggerFunc.accept(e, "UpdateTask::consume: preprocessor failed!");
+						loggerFunc.accept(e, "UpdateTask::consume: fetch iterator failed!");
 					}
 				}
 				return data!=null;
@@ -222,7 +224,7 @@ public abstract class UpdateTask<E, T>
 		}, queueCapacity, timeout, unit, consumers.toArray(new Consumer[consumers.size()]));
 	}
 
-	protected void updaterInit(DbUpdater<T> dbUpdater) throws SQLException
+	protected <T> void updaterInit(DbUpdater<T> dbUpdater) throws SQLException
 	{
 		dbUpdater.init();
 		try
@@ -236,7 +238,7 @@ public abstract class UpdateTask<E, T>
 		}
 	}
 
-	protected void updaterConsume(DbUpdater<T> dbUpdater, T data, BiConsumer<? super Exception, String> loggerFunc)
+	protected <T> void updaterConsume(DbUpdater<T> dbUpdater, T data, BiConsumer<? super Exception, String> loggerFunc)
 	{
 		try
 		{
@@ -262,7 +264,7 @@ public abstract class UpdateTask<E, T>
 		}
 	}
 
-	protected void updaterFinalize(DbUpdater<T> dbUpdater, BiConsumer<? super Exception, String> loggerFunc)
+	protected <T> void updaterFinalize(DbUpdater<T> dbUpdater, BiConsumer<? super Exception, String> loggerFunc)
 	{
 		try
 		{

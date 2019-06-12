@@ -14,16 +14,14 @@ import com.eroelf.javaxsx.util.FileSysUtil;
 
 /**
  * This class converts an input directory to an iterator whose next() method returns the processed result of each line in the files under the directory.
- * Override {@link #processLine(String)} to process each line or just invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method.
+ * A simple usage is to invoke the {@link #forEachRemaining(java.util.function.Consumer) forEachRemaining} method to process each line.
  * 
  * @author weikun.zhong
- *
- * @param <E> the return type of the {@link #next()} method.
  * 
  * @see FileIterator
  * @see FileSysUtil
  */
-public class DirFileIterator<E> extends FileIterator<E>
+public class DirFileIterator extends FileIterator
 {
 	protected List<File> files;
 
@@ -89,18 +87,17 @@ public class DirFileIterator<E> extends FileIterator<E>
 			return true;
 		else
 		{
-			int len=files.size();
-			if(len==0)
-				return false;
-			else
+			boolean flag=false;
+			while(!flag && !files.isEmpty())
 			{
-				this.load(files.remove(len-1));
-				return super.hasNext();
+				this.load(files.remove(files.size()-1));
+				flag=super.hasNext();
 			}
+			return flag;
 		}
 	}
 
-	public Stream<E> lines()
+	public Stream<String> lines()
 	{
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(this, Spliterator.ORDERED|Spliterator.NONNULL), false);
 	}

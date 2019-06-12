@@ -40,7 +40,7 @@ int queueCapacity;// The capacity of the queue holding products that waiting to 
 int nThreads;// Number of consumers.
 long timeout;// Time to wait for the threads to join.
 TimeUnit unit;// The unit of timeout.
-Consumer<Product> handler=p -> System.out.println(p.toString());// Define how consumers should process those products.
+Consumer<Product> handler=p -> System.out.println(p.toString());// Define how do consumers process those products.
 
 ProducerConsumer pc=new ProducerConsumer();
 pc.consume(iterator, queueCapacity, nThreads, timeout, unit, handler);
@@ -110,9 +110,9 @@ DbUpdater<Person> dbUpdater2=new DbUpdater {
 };
 
 String inputFileName;
-Gson gson;
-UpdateTask<String, Person> task=new UpdateTask(dbUpdater1, dbUpdater2);
-task.consume(new FileIterator<String>(inputFileName).forEachRemaining(line -> gson.fromJson(line, Person.class)));
+Gson gson=new Gson();
+UpdateTask task=new UpdateTask();
+task.consume(Iterators.transform(new FileIterator(inputFileName), line -> gson.fromJson(line, Person.class)), dbUpdater1, dbUpdater2);
 ```
 
 #### geo
@@ -179,8 +179,8 @@ FileReaderPlus.readAFile(fileName, (line) -> {
     ...
     return true;
 });
-new FileIterator<String>(fileName).lines();
-new DirFileIterator<String>("/").lines();
+new FileIterator(fileName).lines();
+new DirFileIterator("/").lines();
 ```
 
 Support *text*, *gzip*, *bzip2*, and *zip* format. Extend *InputHelper* class and override *getCompressType* and *convert* methods to modify compress type judgment and to support more file types.
@@ -337,6 +337,8 @@ Implemented *HashMapTrie* and *DoubleArrayTrie*, and a simple trie division algo
 
 ##### *Strings*
 
+##### *ArrayUtil*
+
 ##### *CollectionUtil*
 
 ##### *FileSysUtil*
@@ -346,8 +348,6 @@ Implemented *HashMapTrie* and *DoubleArrayTrie*, and a simple trie division algo
 ##### *NumBytes*
 
 ##### *TimeLasted*
-
-##### *ArrayUtil*
 
 ## Authors
 
