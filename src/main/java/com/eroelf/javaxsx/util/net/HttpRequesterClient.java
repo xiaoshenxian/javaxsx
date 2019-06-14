@@ -55,6 +55,11 @@ public class HttpRequesterClient implements Closeable
 		client=builder.build();
 	}
 
+	public String sendGet(String uri) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		return sendGet(uri, null);
+	}
+
 	public String sendGet(String uri, Map<String, Object> params) throws URISyntaxException, ClientProtocolException, IOException
 	{
 		HttpGet httpGet=new HttpGet(getUri(uri, params));
@@ -69,9 +74,19 @@ public class HttpRequesterClient implements Closeable
 		});
 	}
 
+	public String sendPost(String uri) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		return sendPost(uri, null, (HttpEntity)null);
+	}
+
 	public String sendPost(String uri, Map<String, Object> params) throws URISyntaxException, ClientProtocolException, IOException
 	{
 		return sendPost(uri, params, (HttpEntity)null);
+	}
+
+	public String sendPost(String uri, HttpEntity httpEntity) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		return sendPost(uri, null, httpEntity);
 	}
 
 	public String sendPost(String uri, Map<String, Object> params, HttpEntity httpEntity) throws URISyntaxException, ClientProtocolException, IOException
@@ -108,6 +123,11 @@ public class HttpRequesterClient implements Closeable
 	public String sendPost(String uri, Map<String, Object> params, Map<String, Object> headers) throws URISyntaxException, ClientProtocolException, IOException
 	{
 		return sendPost(uri, params, null, headers);
+	}
+
+	public String sendPost(String uri, HttpEntity httpEntity, Map<String, Object> headers) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		return sendPost(uri, null, httpEntity, headers);
 	}
 
 	public String sendPost(String uri, Map<String, Object> params, HttpEntity httpEntity, Map<String, Object> headers) throws URISyntaxException, ClientProtocolException, IOException

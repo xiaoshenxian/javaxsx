@@ -56,6 +56,11 @@ public final class RequestUrl
 		return sendGet(url, enc, queries, null, connectTimeout, readTimeout);
 	}
 
+	public static InputStream sendPost(String url)
+	{
+		return sendPost(url, null);
+	}
+
 	public static InputStream sendPost(String url, Map<?, ?> queries)
 	{
 		return sendPost(url, UrlUtil.DEFAULT_ENC, queries);
@@ -137,6 +142,11 @@ public final class RequestUrl
 		return joinResponseList(sendGetAskList(url, enc, queries, requestProperties, connectTimeout, readTimeout));
 	}
 
+	public static String sendPostAskString(String url)
+	{
+		return sendPostAskString(url, null);
+	}
+
 	public static String sendPostAskString(String url, Map<?, ?> queries)
 	{
 		return sendPostAskString(url, UrlUtil.DEFAULT_ENC, queries);
@@ -203,6 +213,11 @@ public final class RequestUrl
 		{
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public static List<String> sendPostAskList(String url)
+	{
+		return sendPostAskList(url, null);
 	}
 
 	public static List<String> sendPostAskList(String url, Map<?, ?> queries)

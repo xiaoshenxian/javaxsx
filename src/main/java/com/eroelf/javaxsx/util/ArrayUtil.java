@@ -148,6 +148,7 @@ public final class ArrayUtil
 	/**
 	 * Get the shape of the input array.
 	 * The element of the array will be regarded as the shallow-most-non-array object, or empty.
+	 * If the {@code obj} does not represent an array class this method returns {@code int[0]}.
 	 * 
 	 * @param obj the input array.
 	 * @return the shape of the input array.
@@ -190,6 +191,28 @@ public final class ArrayUtil
 			temp=facets[i];
 		}
 		return facets;
+	}
+
+	/**
+	 * Get the component type of the input array.
+	 * The element of the array will be regarded as the shallow-most-non-array object, or empty.
+	 * If the {@code obj} does not represent an array class this method returns {@code null}.
+	 * 
+	 * @param obj the input array.
+	 * @return the component type of the input array.
+	 */
+	public static Class<?> getComponentType(Object obj)
+	{
+		Object last=null;
+		while(obj.getClass().isArray())
+		{
+			last=obj;
+			if(Array.getLength(obj)>0)
+				obj=Array.get(obj, 0);
+			else
+				break;
+		}
+		return last!=null ? last.getClass().getComponentType() : null;
 	}
 
 	/**
