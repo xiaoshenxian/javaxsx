@@ -232,7 +232,7 @@ public final class GroupingUtil
 		{
 			if(identifierValidator.isValidIdentifier(identifier))
 			{
-				double hash=hashGetter.hash(identifier);
+				double hash=hashGetter.hash(identifier+suffix);
 				if(hash>=0 && hash<1)
 				{
 					lock.readLock().lock();
