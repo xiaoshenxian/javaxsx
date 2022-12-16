@@ -21,16 +21,16 @@ import com.google.gson.InstanceCreator;
  */
 public class EnumSetInstanceCreator<E extends Enum<E>> implements InstanceCreator<EnumSet<E>>
 {
-	private final Class<E> enumClazz;
+	private final Class<E> enumClass;
 
-	public EnumSetInstanceCreator(final Class<E> enumClazz)
+	public EnumSetInstanceCreator(final Class<E> enumClass)
 	{
-		this.enumClazz=enumClazz;
+		this.enumClass=enumClass;
 	}
 
 	@Override
 	public EnumSet<E> createInstance(Type type)
 	{
-		return EnumSet.noneOf(enumClazz);
+		return EnumSet.noneOf(enumClass);
 	}
 }

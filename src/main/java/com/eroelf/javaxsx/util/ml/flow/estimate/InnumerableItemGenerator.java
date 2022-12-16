@@ -35,11 +35,11 @@ public abstract class InnumerableItemGenerator<T extends Item> implements ItemGe
 	protected abstract T findExistedItem(T item);
 
 	/**
-	 * This method will be called in the {@link InnumerableItemGenerator#update(Item) update} method for saving the given {@code item} if there was no pre-generated {@link Item} object, which is identical to the given {@code item}, found in the candidate set.
+	 * This method will be called in the {@link InnumerableItemGenerator#update(Item) update} method for saving the given {@code item} if there was no pre-generated {@link Item} object that is identical to the given {@code item} found in the candidate set.
 	 * 
 	 * @param item the given {@link Item} object to be saved.
 	 */
-	protected abstract void saveToExisted(T item);
+	protected abstract void saveAsNew(T item);
 
 	/**
 	 * Traverses all {@link Item} objects after all {@link Strategy} instances finished their {@link Strategy#generate(Predicate) generate} methods.
@@ -68,7 +68,7 @@ public abstract class InnumerableItemGenerator<T extends Item> implements ItemGe
 		if(existed!=null)
 			existed.update(item);
 		else
-			saveToExisted(item);
+			saveAsNew(item);
 	}
 
 	/**

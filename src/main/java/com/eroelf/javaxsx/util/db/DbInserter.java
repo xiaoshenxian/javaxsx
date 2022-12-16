@@ -2,9 +2,8 @@ package com.eroelf.javaxsx.util.db;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
 
-import com.eroelf.javaxsx.util.db.DoDb;
+import com.google.common.collect.Iterables;
 
 /**
  * A database inserter defines methods for different stages related to insert data into a database.
@@ -19,23 +18,19 @@ import com.eroelf.javaxsx.util.db.DoDb;
 public abstract class DbInserter<T> implements DbUpdater<T>
 {
 	protected DoDb doDb;
-	protected String dbHost;
-	protected int dbPort;
-	protected String dbUser;
-	protected String dbPassword;
-	protected String dbName;
+	protected String url;
+	protected String user;
+	protected String pwd;
 	protected String dbTable;
 	protected int batchSize;
 
 	private int acceptCount=0;
 
-	public DbInserter(String dbHost, int dbPort, String dbUser, String dbPassword, String dbName, String dbTable, int batchSize)
+	public DbInserter(String url, String user, String pwd, String dbTable, int batchSize)
 	{
-		this.dbHost=dbHost;
-		this.dbPort=dbPort;
-		this.dbUser=dbUser;
-		this.dbPassword=dbPassword;
-		this.dbName=dbName;
+		this.url=url;
+		this.user=user;
+		this.pwd=pwd;
 		this.dbTable=dbTable;
 		this.batchSize=batchSize;
 	}
@@ -43,15 +38,13 @@ public abstract class DbInserter<T> implements DbUpdater<T>
 	@Override
 	public void init() throws SQLException
 	{
-		doDb=new DoDb(DriverManager.getConnection(String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&autoReconnect=true&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai", dbHost, dbPort, dbName), dbUser, dbPassword));
+		doDb=new DoDb(DriverManager.getConnection(url, user, pwd));
 	}
 
 	@Override
 	public void prepareStatement(Object[] data) throws SQLException
 	{
-		String[] placeholders=new String[data.length];
-		Arrays.fill(placeholders, "?");
-		doDb.prepareStatement(true, String.format("insert into %s values (%s)", dbTable, String.join(",", placeholders)));
+		doDb.prepareStatement(true, String.format("insert into %s values (%s)", dbTable, String.join(",", Iterables.limit(Iterables.cycle("?"), data.length))));
 	}
 
 	@Override

@@ -65,7 +65,7 @@ public abstract class AbstractSimpleDbGroupingInfoSource implements GroupingInfo
 	}
 
 	@Override
-	public void close()
+	public void close() throws SQLException
 	{
 		doDb.close();
 	}

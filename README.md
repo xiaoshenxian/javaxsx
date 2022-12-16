@@ -261,7 +261,7 @@ System.out.println(histStr);
 
 #### ml
 
-This package is an abstract core working flow of any certain recall, recommendation, estimating, scoring, and ranking system.
+This package is an abstract core working flow of any certain recall, recommender, estimating, scoring, and ranking system.
 
 There is a [demo](https://github.com/xiaoshenxian/modeling_demo) for a simple usage.
 
@@ -275,17 +275,17 @@ For *Item* feature storing and scoring.
   
   * score package
   
-  A *Scoreable* object can be "scored" by a *Scorer* object and hold the final score until next modification. *Scoreable* objects are *Comparable* by their scores in descending order, which implies the higher the score the "better" the *Scoreable* object is. This is consistent to general ranking and recommendation projects.
+  A *Scoreable* object can be "scored" by a *Scorer* object and hold the final score until next modification. *Scoreable* objects are *Comparable* by their scores in descending order, which implies the higher the score the "better" the *Scoreable* object is. This is consistent to general ranking and recommender projects.
   
   * strategy package
   
   A *Strategy* object is a *Modeler* object but with method to recall candidates under its definition.
   
-An *Item* object is both a *Modelable* and a *Scoreable* object. This means an *Item* object is very suitable to represent a specified "product" in a well defined ranking and recommendation system.
+An *Item* object is both a *Modelable* and a *Scoreable* object. This means an *Item* object is very suitable to represent a specified "product" in a well defined ranking and recommender system.
 
 * flow package
 
-This package defines general working flows for ranking and recommendation systems in both enumerable candidate situation and innumerable candidate situation. Note that innumerable candidate situation can also be used in enumerable candidate situation.
+This package defines general working flows for ranking and recommender systems in both enumerable candidate situation and innumerable candidate situation. Note that innumerable candidate situation can also be used in enumerable candidate situation.
 
   * controller package
   
@@ -303,7 +303,7 @@ This package defines general working flows for ranking and recommendation system
   
   * Item, Info, and InfoLog
   
-  As described above, objects of all the three classes are "products" in a specified ranking and recommendation system. *Item* class is used for back-end data, *Info* class is used for front-end data, and *InfoLog* class is used for logging necessary information for *Info* objects.
+  As described above, objects of all the three classes are "products" in a specified ranking and recommender system. *Item* class is used for back-end data, *Info* class is used for front-end data, and *InfoLog* class is used for logging necessary information for *Info* objects.
 
 #### monitor
 

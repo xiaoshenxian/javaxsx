@@ -4,6 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Character.UnicodeBlock;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -223,7 +225,7 @@ public final class Strings
 			throw new IllegalArgumentException("s="+s+", minLength="+minLength);
 	}
 
-	public static <T extends Enum<T>> T string2Enum(String s, Class<T> clazz)
+	public static <T extends Enum<T>> T stringToEnum(String s, Class<T> clazz)
 	{
 		if(s!=null && clazz!=null)
 		{
@@ -385,6 +387,16 @@ public final class Strings
 		return ub==UnicodeBlock.HANGUL_SYLLABLES || ub==UnicodeBlock.HANGUL_JAMO || ub==UnicodeBlock.HANGUL_COMPATIBILITY_JAMO;
 	}
 
+	public static boolean isControl(char ch)
+	{
+		if(ch=='\t' || ch=='\n' ||ch =='\r')
+			return false;
+		int cat=Character.getType(ch);
+		if(cat==0 || cat==15 || cat==16 || cat==18 || cat==19)
+			return true;
+		return false;
+	}
+
 	public static boolean isEnglishPunctuation(char c)
 	{
 		return (c>0x0020 && c<=0x002f) || (c>=0x003a && c<=0x0040) || (c>=0x005b && c<=0x0060) || (c>=0x007b && c<=0x007e);
@@ -420,7 +432,72 @@ public final class Strings
 		return isEnglishPunctuation(c) || isLatin1PunctuationAndSymbols(c) || isGeneralAndSupplementalPunctuation(c) || isCJKPunctuation(c);
 	}
 
-	public static char number2ChineseNumber(char c)
+	public static boolean containsEnglishPunctuation(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isEnglishPunctuation(c))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean containsControl(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isControl(c))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean containsLatin1PunctuationAndSymbols(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isLatin1PunctuationAndSymbols(c))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean containsGeneralAndSupplementalPunctuation(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isGeneralAndSupplementalPunctuation(c))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean containsCJKPunctuation(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isCJKPunctuation(c))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean containsPunctuation(String s)
+	{
+		for(char c : s.toCharArray())
+		{
+			if(isPunctuation(c))
+				return true;
+		}
+		return false;
+	}
+
+	public String stripAccents(String s)
+	{
+		return Normalizer.normalize(s, Form.NFD).replaceAll("\\p{M}", "");
+	}
+
+	public static char numberToChineseNumber(char c)
 	{
 		if(c>=0x30 && c<=0x39)
 			return CHINESE_NUM[c-0x30];
@@ -436,17 +513,17 @@ public final class Strings
 			return c;
 	}
 
-	public static String number2ChineseNumber(String s)
+	public static String numberToChineseNumber(String s)
 	{
 		char[] chars=s.toCharArray();
 		for(int i=0; i<chars.length; i++)
 		{
-			chars[i]=number2ChineseNumber(chars[i]);
+			chars[i]=numberToChineseNumber(chars[i]);
 		}
 		return new String(chars);
 	}
 
-	public static char chineseNumber2Number(char c)
+	public static char chineseNumberToNumber(char c)
 	{
 		if(CHINESE_NUMBER_TO_NUMBER_MAP.containsKey(c))
 			return CHINESE_NUMBER_TO_NUMBER_MAP.get(c);
@@ -454,11 +531,11 @@ public final class Strings
 			return c;
 	}
 
-	public static String chineseNumber2Number(String s)
+	public static String chineseNumberToNumber(String s)
 	{
 		char[] chars=s.toCharArray();
 		for(int i=0; i<chars.length; i++)
-			chars[i]=chineseNumber2Number(chars[i]);
+			chars[i]=chineseNumberToNumber(chars[i]);
 		return new String(chars);
 	}
 
@@ -467,7 +544,7 @@ public final class Strings
 		return CHINESE_NUM_UNIT.contains(c);
 	}
 
-	public static List<Double> convertChineseNumber2Float(String s)
+	public static List<Double> convertChineseNumberToFloat(String s)
 	{
 		List<Double> res=new ArrayList<>();
 		Stack<Double> nums=new Stack<>();
@@ -480,7 +557,7 @@ public final class Strings
 		Character lastCh=null;
 		for(char c : s.toCharArray())
 		{
-			c=traditional2Simplified(toHalfWidth(c));
+			c=traditionalToSimplified(toHalfWidth(c));
 			double num=CHINESE_NUMBER_TO_INT_MAP.containsKey(c) ? CHINESE_NUMBER_TO_INT_MAP.get(c) : -1;
 			if(num>=0)
 			{
@@ -533,10 +610,18 @@ public final class Strings
 				{
 					applyNumberOrder(nums, orders, 1);
 					if(c=='点' || c=='.')
+					{
+						if(decimalOrder<1)
+						{
+							processNumberStack(nums, orders, res, nagFlag, combining);
+							nagFlag=1;
+						}
 						decimalOrder=0.1;
+					}
 					else
 					{
 						processNumberStack(nums, orders, res, nagFlag, combining);
+						decimalOrder=1;
 						if(c=='正' || c=='+')
 							nagFlag=1;
 						else if(c=='负' || c=='-')
@@ -549,16 +634,13 @@ public final class Strings
 				{
 					if(c=='点' || c=='.')
 					{
-						if(lastCh=='点' || c=='.')
-						{
-							processNumberStack(nums, orders, res, nagFlag, combining);
-							nagFlag=1;
-						}
+						if((lastCh!='点' && lastCh!='.') && decimalOrder<1)
+							throw new IllegalArgumentException("Invalid character combination: "+lastCh+c);
 						decimalOrder=0.1;
 					}
 					else
 					{
-						if(lastCh=='点' || c=='.')
+						if(lastCh=='点' || lastCh=='.')
 							throw new IllegalArgumentException("Invalid character combination: "+lastCh+c);
 						if(c=='正' || c=='+')
 							nagFlag=1;
@@ -630,11 +712,11 @@ public final class Strings
 		}
 	}
 
-	public static String convertChineseNumber2DigitsStr(String s)
+	public static String convertChineseNumberToDigitsStr(String s)
 	{
 		List<String> res=new ArrayList<>();
 		Pattern p=Pattern.compile("[正负]*点*[\\d零一二三四五六七八九〇壹贰叁肆伍陆柒捌玖弌弍弎十拾百佰千仟万兆亿]+[正负点\\d零一二三四五六七八九〇壹贰叁肆伍陆柒捌玖弌弍弎十拾百佰千仟万兆亿]*");
-		Matcher matcher=p.matcher(traditional2Simplified(toHalfWidth(s)));
+		Matcher matcher=p.matcher(traditionalToSimplified(toHalfWidth(s)));
 		int lastEnd=0;
 		while(matcher.find())
 		{
@@ -642,7 +724,7 @@ public final class Strings
 			int end=matcher.end();
 			if(lastEnd<start)
 				res.add(s.substring(lastEnd, start));
-			for(double num : convertChineseNumber2Float(s.substring(start, end)))
+			for(double num : convertChineseNumberToFloat(s.substring(start, end)))
 			{
 				if((long)num==num)
 					res.add(String.valueOf((long)num));
@@ -656,12 +738,12 @@ public final class Strings
 		return String.join("", res);
 	}
 
-	public static String convertInt2ChineseNumber(long num)
+	public static String convertIntToChineseNumber(long num)
 	{
-		return convertFloat2ChineseNumber(num, 0);
+		return convertFloatToChineseNumber(num, 0);
 	}
 
-	public static String convertFloat2ChineseNumber(double num, int precision)
+	public static String convertFloatToChineseNumber(double num, int precision)
 	{
 		if(Double.isInfinite(num))
 			return String.valueOf(num);
@@ -679,7 +761,7 @@ public final class Strings
 		{
 			long d=intPart%10;
 			intPart/=10;
-			digits.push(Strings.number2ChineseNumber((char)('0'+d)));
+			digits.push(Strings.numberToChineseNumber((char)('0'+d)));
 			if(count!=0 && count%8==0)
 				units.push('亿');
 			else
@@ -721,14 +803,14 @@ public final class Strings
 			}
 			lastD=d;
 		}
-		if(precision>0)
+		if(decimal>0 || precision>0)
 		{
 			builder.append('点');
 			double order=Math.pow(10, precision);
 			intPart=(long)(decimal*order+0.5);
 			while(precision>0)
 			{
-				digits.push(Strings.number2ChineseNumber((char)('0'+intPart%10)));
+				digits.push(Strings.numberToChineseNumber((char)('0'+intPart%10)));
 				intPart/=10;
 				--precision;
 			}
@@ -736,11 +818,11 @@ public final class Strings
 				builder.append(digits.pop());
 		}
 		if(negFlag)
-			builder.insert(0, '-');
+			builder.insert(0, '负');
 		return builder.toString();
 	}
 
-	public static char simplified2Traditional(char c)
+	public static char simplifiedToTraditional(char c)
 	{
 		if(S_TO_T.containsKey(c))
 			return S_TO_T.get(c);
@@ -748,17 +830,17 @@ public final class Strings
 			return c;
 	}
 
-	public static String simplified2Traditional(String s)
+	public static String simplifiedToTraditional(String s)
 	{
 		char[] chars=s.toCharArray();
 		for(int i=0; i<chars.length; i++)
 		{
-			chars[i]=simplified2Traditional(chars[i]);
+			chars[i]=simplifiedToTraditional(chars[i]);
 		}
 		return new String(chars);
 	}
 
-	public static char traditional2Simplified(char c)
+	public static char traditionalToSimplified(char c)
 	{
 		if(T_TO_S.containsKey(c))
 			return T_TO_S.get(c);
@@ -766,14 +848,58 @@ public final class Strings
 			return c;
 	}
 
-	public static String traditional2Simplified(String s)
+	public static String traditionalToSimplified(String s)
 	{
 		char[] chars=s.toCharArray();
 		for(int i=0; i<chars.length; i++)
 		{
-			chars[i]=traditional2Simplified(chars[i]);
+			chars[i]=traditionalToSimplified(chars[i]);
 		}
 		return new String(chars);
+	}
+
+	public static String toHexString(byte[] input)
+	{
+		return toHexString(input, 0, input.length, true);
+	}
+
+	public static String toHexString(byte[] input, boolean upper)
+	{
+		return toHexString(input, 0, input.length, upper);
+	}
+
+	public static String toHexString(byte[] input, int off, int length)
+	{
+		return toHexString(input, off, length, true);
+	}
+
+	public static String toHexString(byte[] input, int off, int length, boolean upper)
+	{
+		String fmt;
+		if(upper)
+			fmt="%02X";
+		else
+			fmt="%02x";
+		StringBuilder re=new StringBuilder();
+		for(int i=off; i<off+length; i++)
+		{
+			re.append(String.format(fmt, input[i] & 0xff));
+		}
+		return re.toString();
+	}
+
+	public static int fromHexString(String input, byte[] des)
+	{
+		return fromHexString(input, des, 0);
+	}
+
+	public static int fromHexString(String input, byte[] des, int off)
+	{
+		for(int i=0; i<input.length()-1; i+=2)
+		{
+			des[off++]=Byte.valueOf(input.substring(i, i+2), 16);
+		}
+		return off;
 	}
 
 	public static byte[] md5Digest(String s)
@@ -826,13 +952,7 @@ public final class Strings
 
 	public static String md5(byte[] input)
 	{
-		byte[] thedigest=md5Digest(input);
-		StringBuilder re=new StringBuilder();
-		for(int i=0; i<thedigest.length; i++)
-		{
-			re.append(String.format("%02x", thedigest[i] & 0xff));
-		}
-		return re.toString();
+		return toHexString(md5Digest(input));
 	}
 
 	private Strings()

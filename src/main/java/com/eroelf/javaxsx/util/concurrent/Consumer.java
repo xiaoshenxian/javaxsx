@@ -17,6 +17,8 @@ import com.eroelf.javaxsx.util.StdLoggers;
  */
 public class Consumer<T> implements java.util.function.Consumer<T>, Runnable
 {
+	public static final Object END_TOKEN=new Object();
+
 	protected BlockingQueue<T> taskQueue;
 	protected java.util.function.Consumer<T> consumeFunc;
 	protected BiConsumer<? super Exception, String> loggerFunc;
@@ -84,7 +86,10 @@ public class Consumer<T> implements java.util.function.Consumer<T>, Runnable
 			try
 			{
 				elem=taskQueue.take();
-				consumeFunc.accept(elem);
+				if(elem!=END_TOKEN)
+					consumeFunc.accept(elem);
+				else
+					break;
 			}
 			catch(InterruptedException e)
 			{
@@ -95,8 +100,6 @@ public class Consumer<T> implements java.util.function.Consumer<T>, Runnable
 				loggerFunc.accept(e, "Failed to consume an element: "+String.valueOf(elem));
 			}
 		}
-		while((elem=taskQueue.poll())!=null)
-			consumeFunc.accept(elem);
 		end();
 	}
 
