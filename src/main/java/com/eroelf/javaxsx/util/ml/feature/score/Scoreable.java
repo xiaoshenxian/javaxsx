@@ -5,7 +5,7 @@ package com.eroelf.javaxsx.util.ml.feature.score;
  * 
  * @author weikun.zhong
  */
-public class Scoreable implements Comparable<Scoreable>
+public abstract class Scoreable implements Comparable<Scoreable>
 {
 	public double score=Double.NaN;
 

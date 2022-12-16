@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -140,10 +142,27 @@ public final class CollectionUtil
 	 * @param values The {@link Iterable} object contains the data to be selecting.
 	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data contained in the values, all data will be retained.
 	 * @param des The receiver list of the selected elements.
+	 * @return The receiver list.
 	 */
-	public static <T> void randomlySelect(Iterable<T> values, int selectSize, List<T> des)
+	public static <T> List<T> randomlySelect(Iterable<T> values, int selectSize, List<T> des)
 	{
-		randomlySelect(values.iterator(), selectSize, des);
+		return randomlySelect(values.iterator(), selectSize, des);
+	}
+
+	/**
+	 * Randomly select selectSize elements from values, maintaining the original order of the data provided. The size of values may be unknown.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param values The {@link Iterable} object contains the data to be selecting.
+	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data contained in the values, all data will be retained.
+	 * @param des The receiver list of the selected elements.
+	 * @param random A {@link Random} instance to provide randomness.
+	 * @return The receiver list.
+	 */
+	public static <T> List<T> randomlySelect(Iterable<T> values, int selectSize, List<T> des, Random random)
+	{
+		return randomlySelect(values.iterator(), selectSize, des, random);
 	}
 
 	/**
@@ -154,10 +173,26 @@ public final class CollectionUtil
 	 * @param valuesIter The iterator of the data to be selecting.
 	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data provided by the valuesIter, all data will be retained.
 	 * @param des The receiver list of the selected elements.
+	 * @return The receiver list.
 	 */
-	public static <T> void randomlySelect(Iterator<T> valuesIter, int selectSize, List<T> des)
+	public static <T> List<T> randomlySelect(Iterator<T> valuesIter, int selectSize, List<T> des)
 	{
-		Random random=new Random(System.currentTimeMillis());
+		return randomlySelect(valuesIter, selectSize, des, new Random(System.currentTimeMillis()));
+	}
+
+	/**
+	 * Randomly select selectSize elements from valuesIter, maintaining the original order of the data provided. The size of valuesIter may be unknown.
+	 * 
+	 * @param <T> the element type.
+	 * 
+	 * @param valuesIter The iterator of the data to be selecting.
+	 * @param selectSize Indicates how many elements should be selected. If the selectSize is larger than the size of the data provided by the valuesIter, all data will be retained.
+	 * @param des The receiver list of the selected elements.
+	 * @param random A {@link Random} instance to provide randomness.
+	 * @return The receiver list.
+	 */
+	public static <T> List<T> randomlySelect(Iterator<T> valuesIter, int selectSize, List<T> des, Random random)
+	{
 		int count=0;
 		List<Entry<Integer, T>> retains=new ArrayList<>(selectSize);
 		while(valuesIter.hasNext())
@@ -184,25 +219,161 @@ public final class CollectionUtil
 		{
 			des.add(entry.getValue());
 		}
+
+		return des;
 	}
 
 	/**
 	 * Check if the given map contains the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
 	 * 
-	 * @param map the object to check.
+	 * @param map the root map.
 	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
 	 * @return {@code true} if all {@code keys} are contained by the {@code map} in the nested form defined by the {@code keys}' order, otherwise {@code false}.
+     * @throws IllegalArgumentException if any element associate to any key is not a map.
 	 */
 	public static boolean nestedContainsKeys(Object map, Object... keys)
 	{
+		int i=0;
 		for(Object key : keys)
 		{
-			if(map instanceof Map && ((Map<?, ?>)map).containsKey(key))
-				map=((Map<?, ?>)map).get(key);
+			if(map instanceof Map)
+			{
+				if(((Map<?, ?>)map).containsKey(key))
+					map=((Map<?, ?>)map).get(key);
+				else
+					return false;
+			}
 			else
-				return false;
+				throw new IllegalArgumentException("Got "+(map==null ? null : map.getClass().getName())+" in level "+i+", expecting a map!");
+			++i;
 		}
 		return true;
+	}
+
+	/**
+	 * Check if the given map contains the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * Will not throw exception if any of the nested element is not a map.
+	 * 
+	 * @param map the root map.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return {@code true} if all {@code keys} are contained by the {@code map} in the nested form defined by the {@code keys}' order, otherwise {@code false}.
+	 */
+	public static boolean nestedContainsKeysSafe(Object map, Object... keys)
+	{
+		try
+		{
+			return nestedContainsKeys(map, keys);
+		}
+		catch(IllegalArgumentException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Try to get the element stored in the given map with the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * 
+	 * @param map the root map.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return the element represented by {@code keys}, or {@code null} if not found.
+     * @throws IllegalArgumentException if any element associate to any key is not a map.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T nestedGet(Object map, Object... keys)
+	{
+		int i=0;
+		for(Object key : keys)
+		{
+			if(map instanceof Map)
+				map=((Map<?, ?>)map).get(key);
+			else
+				throw new IllegalArgumentException("Got "+(map==null ? null : map.getClass().getName())+" in level "+i+", expecting a map!");
+			++i;
+		}
+		return (T)map;
+	}
+
+	/**
+	 * Try to get the element stored in the given map with the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * Will not throw exception if any of the nested element is not a map.
+	 * 
+	 * @param map the root map.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return the element represented by {@code keys}, or {@code null} if not found.
+	 */
+	public static <T> T nestedGetSafe(Object map, Object... keys)
+	{
+		try
+		{
+			return nestedGet(map, keys);
+		}
+		catch(IllegalArgumentException e)
+		{
+			return null;
+		}
+	}
+
+	/**
+	 * Try to put the {@code value} into the given map with the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * {@code HashMap::new} is chosen as the map generator.
+	 * 
+	 * @param map the root map.
+	 * @param value value to be associated with the specified keys.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return the previous value associated with <tt>keys</tt>, or
+     *         <tt>null</tt> if there was no mapping for <tt>keys</tt>.
+     *         (A <tt>null</tt> return can also indicate that the map
+     *         previously associated <tt>null</tt> with <tt>keys</tt>,
+     *         if the implementation supports <tt>null</tt> values.)
+     * @throws IllegalArgumentException if any element associate to any key is not a map.
+	 * @see #nestedPut(Object, Object, Supplier, Object...)
+	 */
+	public static <T> T nestedPut(Object map, Object value, Object... keys)
+	{
+		return nestedPut(map, value, HashMap::new, keys);
+	}
+
+	/**
+	 * Try to put the {@code value} into the given map with the given keys in a nested form, e.g., like {@code map[key1][key2][...][keyN]} in python.
+	 * 
+	 * @param map the root map.
+	 * @param value value to be associated with the specified keys.
+	 * @param mapGen the map generator to create new maps.
+	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
+	 * @return the previous value associated with <tt>keys</tt>, or
+     *         <tt>null</tt> if there was no mapping for <tt>keys</tt>.
+     *         (A <tt>null</tt> return can also indicate that the map
+     *         previously associated <tt>null</tt> with <tt>keys</tt>,
+     *         if the implementation supports <tt>null</tt> values.)
+     * @throws IllegalArgumentException if any element associate to any key is not a map.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T nestedPut(Object map, Object value, Supplier<Map<?, ?>> mapGen, Object... keys)
+	{
+		int i=0;
+		for(Object key : keys)
+		{
+			if(map instanceof Map)
+			{
+				Map<Object, Object> m=(Map<Object, Object>)map;
+				if(i<keys.length-1)
+				{
+					Object obj=m.get(key);
+					if(obj==null)
+					{
+						obj=mapGen.get();
+						m.put(key, obj);
+					}
+					map=obj;
+				}
+				else
+					return (T)m.put(key, value);
+			}
+			else
+				throw new IllegalArgumentException("Got "+(map==null ? null : map.getClass().getName())+" in level "+i+", expecting a map!");
+			++i;
+		}
+		throw new Error("This is not supposed to be executed.");
 	}
 
 	/**
@@ -310,6 +481,46 @@ public final class CollectionUtil
 		while(iter.hasNext())
 			res.add(iter.next());
 		return res;
+	}
+
+	public static <K, V> HashMap<K, V> toHashMap(Iterable<K> keyIterable, Iterable<V> valueIterable)
+	{
+		return toMap(HashMap::new, keyIterable, valueIterable);
+	}
+
+	public static <K, V> HashMap<K, V> toHashMap(Iterator<K> keyIter, Iterator<V> valueIter)
+	{
+		return toMap(HashMap::new, keyIter, valueIter);
+	}
+
+	public static <K, V> HashMap<K, V> toHashMap(Iterable<Entry<K, V>> iterable)
+	{
+		return toMap(HashMap::new, iterable);
+	}
+
+	public static <K, V> HashMap<K, V> toHashMap(Iterator<Entry<K, V>> iter)
+	{
+		return toMap(HashMap::new, iter);
+	}
+
+	public static <K, V> LinkedHashMap<K, V> toLinkedHashMap(Iterable<K> keyIterable, Iterable<V> valueIterable)
+	{
+		return toMap(LinkedHashMap::new, keyIterable, valueIterable);
+	}
+
+	public static <K, V> LinkedHashMap<K, V> toLinkedHashMap(Iterator<K> keyIter, Iterator<V> valueIter)
+	{
+		return toMap(LinkedHashMap::new, keyIter, valueIter);
+	}
+
+	public static <K, V> LinkedHashMap<K, V> toLinkedHashMap(Iterable<Entry<K, V>> iterable)
+	{
+		return toMap(LinkedHashMap::new, iterable);
+	}
+
+	public static <K, V> LinkedHashMap<K, V> toLinkedHashMap(Iterator<Entry<K, V>> iter)
+	{
+		return toMap(LinkedHashMap::new, iter);
 	}
 
 	public static <T extends Map<K, V>, K, V> T toMap(Supplier<T> creator, Iterable<K> keyIterable, Iterable<V> valueIterable)

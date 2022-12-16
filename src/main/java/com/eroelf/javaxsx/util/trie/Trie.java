@@ -53,7 +53,7 @@ public interface Trie extends Serializable
 	public List<String> getPrefixes(String word, List<String> resultList);
 
 	/**
-	 * Finds all words that can be a substring the of specified word.
+	 * Finds all words that can be a substring of the specified word.
 	 * 
 	 * @param word the word to be checked.
 	 * @param resultList receives the result.

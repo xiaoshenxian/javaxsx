@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.openstreetmap.osmosis.core.util.MultiMemberGZIPInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 /**
  * A helper class for converting files to {@link InputStream} or {@link BufferedReader}.
@@ -168,7 +168,7 @@ public class InputHelper
 			return new ZipTextInputStream(in);
 		case "gzip":
 		case "gz":
-			return new MultiMemberGZIPInputStream(in);
+			return new GzipCompressorInputStream(in);
 		case "bzip2":
 		case "bz2":
 			return new BZip2CompressorInputStream(in);

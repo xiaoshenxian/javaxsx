@@ -2,6 +2,11 @@ package com.eroelf.javaxsx.util.math;
 
 import java.util.Iterator;
 
+/**
+ * An {@link Iterator} for full combination.
+ * 
+ * @author weikun.zhong
+ */
 public class FullCombinationIterator implements Iterator<int[]>
 {
 	private int totalGroups;

@@ -9,7 +9,10 @@ import com.eroelf.javaxsx.util.ml.feature.Item;
  */
 public interface Info
 {
-	public boolean isValid();
+	default public boolean isValid()
+	{
+		return true;
+	}
 
 	default public void convertFrom(Item item, boolean verbose)
 	{}

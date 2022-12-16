@@ -22,16 +22,16 @@ import com.google.gson.InstanceCreator;
  */
 public class EnumMapInstanceCreator<K extends Enum<K>, V> implements InstanceCreator<EnumMap<K, V>>
 {
-	private final Class<K> enumClazz;
+	private final Class<K> enumClass;
 
-	public EnumMapInstanceCreator(Class<K> enumClazz)
+	public EnumMapInstanceCreator(Class<K> enumClass)
 	{
-		this.enumClazz=enumClazz;
+		this.enumClass=enumClass;
 	}
 
 	@Override
 	public EnumMap<K, V> createInstance(Type type)
 	{
-		return new EnumMap<K, V>(enumClazz);
+		return new EnumMap<K, V>(enumClass);
 	}
 }

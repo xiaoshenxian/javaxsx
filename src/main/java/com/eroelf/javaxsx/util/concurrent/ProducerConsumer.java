@@ -47,6 +47,68 @@ public class ProducerConsumer
 	 * 
 	 * @param <T> the type of the input.
 	 * 
+	 * @param iterable the producer which provide the data.
+	 * @param queueCapacity cache size for consumers to compete.
+	 * @param nThreads number of consumers.
+	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
+	 * @param unit the unit of the {@code timeout}.
+	 * @param handler defines how the consumers process the data.
+	 * @return {@code true} if the inner executor terminated and {@code false} if the timeout elapsed before termination.
+	 * 
+	 * @throws InterruptedException if interrupted while waiting consumers to be completed.
+	 */
+	public <T> boolean consume(Iterable<T> iterable, int queueCapacity, int nThreads, long timeout, TimeUnit unit, java.util.function.Consumer<T> handler) throws InterruptedException
+	{
+		return consume(iterable.iterator(), queueCapacity, nThreads, timeout, unit, handler);
+	}
+
+	/**
+	 * This method is the entrance of a special kind of producer-consumer task in which different consumers perform different approaches to all the produced data.
+	 * 
+	 * @param <T> the type of the input.
+	 * 
+	 * @param iterable the producer which provide the data.
+	 * @param queueCapacity cache size for each consumers.
+	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
+	 * @param unit the unit of the {@code timeout}.
+	 * @param handlers defines different consumers to process all the input data.
+	 * @return {@code true} if the inner executor terminated and {@code false} if the timeout elapsed before termination.
+	 * 
+	 * @throws InterruptedException if interrupted while waiting consumers to be completed.
+	 * 
+	 * @see #consume(Iterable, long, TimeUnit, Consumer...)
+	 */
+	public <T> boolean consume(Iterable<T> iterable, int queueCapacity, long timeout, TimeUnit unit, @SuppressWarnings("unchecked") java.util.function.Consumer<T>... handlers) throws InterruptedException
+	{
+		return consume(iterable.iterator(), queueCapacity, timeout, unit, handlers);
+	}
+
+	/**
+	 * This method is the entrance of a special kind of producer-consumer task in which different consumers perform different approaches to all the produced data.
+	 * 
+	 * @param <T> the type of the input.
+	 * 
+	 * @param iterable the producer which provide the data.
+	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
+	 * @param unit the unit of the {@code timeout}.
+	 * @param consumers defines different consumers to process all the input data.
+	 * @return {@code true} if the inner executor terminated and {@code false} if the timeout elapsed before termination.
+	 * 
+	 * @throws InterruptedException if interrupted while waiting consumers to be completed.
+	 * 
+	 * @see #consume(Iterable, int, long, TimeUnit, java.util.function.Consumer...)
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> boolean consume(Iterable<T> iterable, long timeout, TimeUnit unit, Consumer<T>... consumers) throws InterruptedException
+	{
+		return consume(iterable.iterator(), timeout, unit, consumers);
+	}
+
+	/**
+	 * This method is the entrance of a common producer-consumer task in which {@code nThreads} consumers compete data produced buy the producer. Each consumer process the data in the same way.
+	 * 
+	 * @param <T> the type of the input.
+	 * 
 	 * @param iterator the producer which provide the data.
 	 * @param queueCapacity cache size for consumers to compete.
 	 * @param nThreads number of consumers.
@@ -57,6 +119,7 @@ public class ProducerConsumer
 	 * 
 	 * @throws InterruptedException if interrupted while waiting consumers to be completed.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> boolean consume(Iterator<T> iterator, int queueCapacity, int nThreads, long timeout, TimeUnit unit, java.util.function.Consumer<T> handler) throws InterruptedException
 	{
 		BlockingQueue<T> taskQueue=new ArrayBlockingQueue<>(queueCapacity);
@@ -87,8 +150,12 @@ public class ProducerConsumer
 				loggerFunc.accept(e, String.format("Exception in producing an element at %d: %s", elemCount, String.valueOf(elem)));
 			}
 		}
+		for(int i=0; i<nThreads; i++)
+		{
+			((BlockingQueue<Object>)taskQueue).put(Consumer.END_TOKEN);
+		}
 
-		es.shutdownNow();
+		es.shutdown();
 		return es.awaitTermination(timeout, unit);
 	}
 
@@ -106,7 +173,7 @@ public class ProducerConsumer
 	 * 
 	 * @throws InterruptedException if interrupted while waiting consumers to be completed.
 	 * 
-	 * @see #consume(Iterator, int, long, TimeUnit, Consumer...)
+	 * @see #consume(Iterator, long, TimeUnit, Consumer...)
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> boolean consume(Iterator<T> iterator, int queueCapacity, long timeout, TimeUnit unit, java.util.function.Consumer<T>... handlers) throws InterruptedException
@@ -128,7 +195,7 @@ public class ProducerConsumer
 			}
 		}
 
-		return consume(iterator, queueCapacity, timeout, unit, consumers.toArray(new Consumer[consumers.size()]));
+		return consume(iterator, timeout, unit, consumers.toArray(new Consumer[consumers.size()]));
 	}
 
 	/**
@@ -137,7 +204,6 @@ public class ProducerConsumer
 	 * @param <T> the type of the input.
 	 * 
 	 * @param iterator the producer which provide the data.
-	 * @param queueCapacity cache size for each consumers.
 	 * @param timeout the time to wait to all consumers to completing their tasks after all data are put into the cache.
 	 * @param unit the unit of the {@code timeout}.
 	 * @param consumers defines different consumers to process all the input data.
@@ -147,7 +213,8 @@ public class ProducerConsumer
 	 * 
 	 * @see #consume(Iterator, int, long, TimeUnit, java.util.function.Consumer...)
 	 */
-	public <T> boolean consume(Iterator<T> iterator, int queueCapacity, long timeout, TimeUnit unit, @SuppressWarnings("unchecked") Consumer<T>... consumers) throws InterruptedException
+	@SuppressWarnings("unchecked")
+	public <T> boolean consume(Iterator<T> iterator, long timeout, TimeUnit unit, Consumer<T>... consumers) throws InterruptedException
 	{
 		ExecutorService es=Executors.newFixedThreadPool(consumers.length);
 		for(Consumer<T> consumer : consumers)
@@ -162,9 +229,12 @@ public class ProducerConsumer
 			try
 			{
 				elem=iterator.next();
-				for(Consumer<T> consumer : consumers)
+				if(elem!=null)
 				{
-					consumer.enqueue(elem);
+					for(Consumer<T> consumer : consumers)
+					{
+						consumer.enqueue(elem);
+					}
 				}
 			}
 			catch(InterruptedException e)
@@ -178,8 +248,12 @@ public class ProducerConsumer
 			if(!elemAt(elemCount++))
 				break;
 		}
+		for(Consumer<T> consumer : consumers)
+		{
+			((Consumer<Object>)consumer).enqueue(Consumer.END_TOKEN);
+		}
 
-		es.shutdownNow();
+		es.shutdown();
 		return es.awaitTermination(timeout, unit);
 	}
 }

@@ -2,7 +2,9 @@ package com.eroelf.javaxsx.util.gson;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -20,13 +22,24 @@ import com.google.gson.JsonParseException;
 public class EnumInterfaceDeserializer<T> implements JsonDeserializer<T>
 {
 	private Class<T> baseClass;
-	private Map<String, T> name2EnumMap=new HashMap<>();
+	private Map<String, T> nameToEnumMap=new HashMap<>();
+	private Function<String, String> strTrans;
 
 	public EnumInterfaceDeserializer(Class<T> baseClass)
+	{
+		this(baseClass, true);
+	}
+
+	public EnumInterfaceDeserializer(Class<T> baseClass, boolean caseSensitive)
 	{
 		if(!baseClass.isInterface())
 			throw new IllegalArgumentException("An interface for Enums is expected!");
 		this.baseClass=baseClass;
+
+		if(caseSensitive)
+			strTrans=Function.identity();
+		else
+			strTrans=str -> str.toUpperCase(Locale.ENGLISH);
 	}
 
 	public EnumInterfaceDeserializer<T> registerSubEnum(Class<? extends T> subClass)
@@ -35,7 +48,7 @@ public class EnumInterfaceDeserializer<T> implements JsonDeserializer<T>
 			throw new IllegalArgumentException("Only classes that extended the Enum<?> and implemented "+baseClass.getSimpleName()+" are acceptable.");
 		for(T oneEnum : subClass.getEnumConstants())
 		{
-			name2EnumMap.put(oneEnum.toString(), oneEnum);
+			nameToEnumMap.put(strTrans.apply(oneEnum.toString()), oneEnum);
 		}
 		return this;
 	}
@@ -43,6 +56,9 @@ public class EnumInterfaceDeserializer<T> implements JsonDeserializer<T>
 	@Override
 	public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
-		return name2EnumMap.get(json.getAsString());
+		if(!json.isJsonNull())
+			return nameToEnumMap.get(strTrans.apply(json.getAsString()));
+		else
+			return null;
 	}
 }
