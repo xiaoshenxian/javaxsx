@@ -6,11 +6,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -207,18 +209,21 @@ public class HttpRequesterClient implements Closeable
 
 	public <T> T sendGet(String uri, Map<String, Object> params, Map<String, Object> headers, ResponseHandler<T> responseHandler, HttpContext context) throws URISyntaxException, ClientProtocolException, IOException
 	{
-		HttpGet httpGet=new HttpGet(getUri(uri, params));
-		configHeaders(httpGet, headers);
-		return client.execute(httpGet, responseHandler, context);
+		return send(HttpGet::new, uri, params, null, headers, responseHandler, context);
 	}
 
 	public <T> T sendPost(String uri, Map<String, Object> params, HttpEntity httpEntity, Map<String, Object> headers, ResponseHandler<T> responseHandler, HttpContext context) throws URISyntaxException, ClientProtocolException, IOException
 	{
-		HttpPost httpPost=new HttpPost(getUri(uri, params));
-		configHeaders(httpPost, headers);
-		if(httpEntity!=null)
-			httpPost.setEntity(httpEntity);
-		return client.execute(httpPost, responseHandler, context);
+		return send(HttpPost::new, uri, params, httpEntity, headers, responseHandler, context);
+	}
+
+	public <T> T send(Function<URI, HttpRequestBase> method, String uri, Map<String, Object> params, HttpEntity httpEntity, Map<String, Object> headers, ResponseHandler<T> responseHandler, HttpContext context) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		HttpRequestBase request=method.apply(getUri(uri, params));
+		configHeaders(request, headers);
+		if(httpEntity!=null && request instanceof HttpEntityEnclosingRequest)
+			((HttpEntityEnclosingRequest)request).setEntity(httpEntity);
+		return client.execute(request, responseHandler, context);
 	}
 
 	public static URI getUri(String uri, Map<String, Object> params) throws URISyntaxException

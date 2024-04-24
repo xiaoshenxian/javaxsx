@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,17 +42,17 @@ public class IndexedTrie implements Serializable
 	private int avgTireSize;
 	private BiConsumer<? super Exception, String> loggerFunc;
 
-	public <T extends Trie> IndexedTrie(Class<T> trieClass) throws InstantiationException, IllegalAccessException
+	public <T extends Trie> IndexedTrie(Class<T> trieClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		this(trieClass, StdLoggers.STD_ERR_EXCEPTION_MSG_LOGGER);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Trie> IndexedTrie(Class<T> trieClass, BiConsumer<? super Exception, String> loggerFunc) throws InstantiationException, IllegalAccessException
+	public <T extends Trie> IndexedTrie(Class<T> trieClass, BiConsumer<? super Exception, String> loggerFunc) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		setLoggerFunc(loggerFunc);
 		tries=(T[])Array.newInstance(trieClass, 1);
-		tries[0]=trieClass.newInstance();
+		tries[0]=trieClass.getConstructor().newInstance();
 		for(int i=0; i<indeses.length; i++)
 		{
 			indeses[i]=new int[1];
@@ -58,21 +60,22 @@ public class IndexedTrie implements Serializable
 		}
 	}
 
-	public <T extends Trie> IndexedTrie(Class<T> trieClass, int size) throws InstantiationException, IllegalAccessException
+	public <T extends Trie> IndexedTrie(Class<T> trieClass, int size) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		this(trieClass, size, StdLoggers.STD_ERR_EXCEPTION_MSG_LOGGER);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T extends Trie> IndexedTrie(Class<T> trieClass, int size, BiConsumer<? super Exception, String> loggerFunc) throws InstantiationException, IllegalAccessException
+	public <T extends Trie> IndexedTrie(Class<T> trieClass, int size, BiConsumer<? super Exception, String> loggerFunc) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException
 	{
 		setLoggerFunc(loggerFunc);
 		if(size<=0)
 			size=1;
 		tries=(T[])Array.newInstance(trieClass, size);
+		Constructor<T> trieConstructor=trieClass.getConstructor();
 		for(int i=0; i<size; i++)
 		{
-			tries[i]=trieClass.newInstance();
+			tries[i]=trieConstructor.newInstance();
 		}
 	}
 

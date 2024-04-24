@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.eroelf.javaxsx.util.ml.feature.Item;
-
 /**
  * Base class of all items (from any source) for modeling and ranking with features sparsely stored in an ArrayList.
  * 

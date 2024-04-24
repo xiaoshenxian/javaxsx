@@ -28,6 +28,21 @@ public class TimeUtil
 		return getZoned(dateStr, formatter, ZoneId.of("UTC"));
 	}
 
+	public static ZonedDateTime getUTC(LocalDate ld)
+	{
+		return getZoned(ld, ZoneId.of("UTC"));
+	}
+
+	public static ZonedDateTime getUTC(LocalDateTime ldt)
+	{
+		return getZoned(ldt, ZoneId.of("UTC"));
+	}
+
+	public static ZonedDateTime getUTC(Date date)
+	{
+		return getZoned(date, ZoneId.of("UTC"));
+	}
+
 	public static ZonedDateTime getUTCFromDate(String dateStr, String fmt)
 	{
 		return getUTCFromDate(dateStr, DateTimeFormatter.ofPattern(fmt));
@@ -38,6 +53,16 @@ public class TimeUtil
 		return getZonedFromDate(dateStr, formatter, ZoneId.of("UTC"));
 	}
 
+	public static ZonedDateTime getZoned(String dateTimeStr, String fmt)
+	{
+		return getZoned(dateTimeStr, DateTimeFormatter.ofPattern(fmt));
+	}
+
+	public static ZonedDateTime getZoned(String dateTimeStr, DateTimeFormatter formatter)
+	{
+		return getZoned(dateTimeStr, formatter, null);
+	}
+
 	public static ZonedDateTime getZoned(String dateTimeStr, String fmt, ZoneId zoneId)
 	{
 		return getZoned(dateTimeStr, DateTimeFormatter.ofPattern(fmt), zoneId);
@@ -45,7 +70,30 @@ public class TimeUtil
 
 	public static ZonedDateTime getZoned(String dateTimeStr, DateTimeFormatter formatter, ZoneId zoneId)
 	{
-		return ZonedDateTime.of(getLocal(dateTimeStr, formatter), zoneId);
+		try
+		{
+			ZonedDateTime zonedDateTime=ZonedDateTime.parse(dateTimeStr, formatter);
+			return zoneId==null ? zonedDateTime : zonedDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+		}
+		catch(Exception e)
+		{
+			return ZonedDateTime.of(getLocal(dateTimeStr, formatter), zoneId);
+		}
+	}
+
+	public static ZonedDateTime getZoned(LocalDate ld, ZoneId zoneId)
+	{
+		return getZoned(getLocalFromDate(ld), zoneId);
+	}
+
+	public static ZonedDateTime getZoned(LocalDateTime ldt, ZoneId zoneId)
+	{
+		return ZonedDateTime.of(ldt, zoneId);
+	}
+
+	public static ZonedDateTime getZoned(Date date, ZoneId zoneId)
+	{
+		return ZonedDateTime.ofInstant(date.toInstant(), zoneId);
 	}
 
 	public static ZonedDateTime getZonedFromDate(String dateStr, String fmt, ZoneId zoneId)
@@ -58,24 +106,69 @@ public class TimeUtil
 		return ZonedDateTime.of(getLocalFromDate(dateStr, formatter), zoneId);
 	}
 
-	public static ZonedDateTime getUTCFromLocalDate(Date date)
+	public static ZonedDateTime getUTCFromLocal(LocalDate ld)
 	{
-		return getZonedFromLocalDate(date, ZoneId.of("UTC"));
+		return getZonedFromLocal(ld, ZoneId.of("UTC"));
 	}
 
-	public static ZonedDateTime getUTCFromZonedDate(Date date, ZoneId original)
+	public static ZonedDateTime getUTCFromLocal(LocalDateTime ldt)
 	{
-		return getZonedFromZonedDate(date, original, ZoneId.of("UTC"));
+		return getZonedFromLocal(ldt, ZoneId.of("UTC"));
 	}
 
-	public static ZonedDateTime getZonedFromLocalDate(Date date, ZoneId target)
+	public static ZonedDateTime getUTCFromLocal(Date date)
 	{
-		return getZonedFromZonedDate(date, ZoneId.systemDefault(), target);
+		return getZonedFromLocal(date, ZoneId.of("UTC"));
 	}
 
-	public static ZonedDateTime getZonedFromZonedDate(Date date, ZoneId original, ZoneId target)
+	public static ZonedDateTime getUTCFromZoned(LocalDate ld, ZoneId original)
 	{
-		return ZonedDateTime.ofInstant(date.toInstant(), original).withZoneSameLocal(target);
+		return getZonedFromZoned(ld, original, ZoneId.of("UTC"));
+	}
+
+	public static ZonedDateTime getUTCFromZoned(LocalDateTime ldt, ZoneId original)
+	{
+		return getZonedFromZoned(ldt, original, ZoneId.of("UTC"));
+	}
+
+	public static ZonedDateTime getUTCFromZoned(Date date, ZoneId original)
+	{
+		return getZonedFromZoned(date, original, ZoneId.of("UTC"));
+	}
+
+	public static ZonedDateTime getZonedFromLocal(LocalDate ld, ZoneId target)
+	{
+		return getZonedFromZoned(ld, ZoneId.systemDefault(), target);
+	}
+
+	public static ZonedDateTime getZonedFromLocal(LocalDateTime ldt, ZoneId target)
+	{
+		return getZonedFromZoned(ldt, ZoneId.systemDefault(), target);
+	}
+
+	public static ZonedDateTime getZonedFromLocal(Date date, ZoneId target)
+	{
+		return getZonedFromZoned(date, ZoneId.systemDefault(), target);
+	}
+
+	public static ZonedDateTime getZonedFromZoned(LocalDate ld, ZoneId original, ZoneId target)
+	{
+		return getZonedFromZoned(getLocalFromDate(ld), original, target);
+	}
+
+	public static ZonedDateTime getZonedFromZoned(LocalDateTime ldt, ZoneId original, ZoneId target)
+	{
+		return ZonedDateTime.of(ldt, original).withZoneSameInstant(target);
+	}
+
+	public static ZonedDateTime getZonedFromZoned(Date date, ZoneId original, ZoneId target)
+	{
+		return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).withZoneSameLocal(original).withZoneSameInstant(target);
+	}
+
+	public static LocalDateTime getUTCLocal(ZonedDateTime zdt)
+	{
+		return getLocal(zdt, ZoneId.of("UTC"));
 	}
 
 	public static LocalDateTime getLocal(String dateTimeStr, String fmt)
@@ -88,6 +181,21 @@ public class TimeUtil
 		return LocalDateTime.parse(dateTimeStr, formatter);
 	}
 
+	public static LocalDateTime getLocal(ZonedDateTime zdt)
+	{
+		return zdt.toLocalDateTime();
+	}
+
+	public static LocalDateTime getLocal(ZonedDateTime zdt, ZoneId zoneId)
+	{
+		return zdt.withZoneSameInstant(zoneId).toLocalDateTime();
+	}
+
+	public static LocalDateTime getLocal(Date date)
+	{
+		return LocalDateTime.from(date.toInstant());
+	}
+
 	public static LocalDateTime getLocalFromDate(String dateStr, String fmt)
 	{
 		return getLocalFromDate(dateStr, DateTimeFormatter.ofPattern(fmt));
@@ -95,7 +203,12 @@ public class TimeUtil
 
 	public static LocalDateTime getLocalFromDate(String dateStr, DateTimeFormatter formatter)
 	{
-		return LocalDate.parse(dateStr, formatter).atTime(LocalTime.MIN);
+		return getLocalFromDate(LocalDate.parse(dateStr, formatter));
+	}
+
+	public static LocalDateTime getLocalFromDate(LocalDate ld)
+	{
+		return ld.atTime(LocalTime.MIN);
 	}
 
 	public static LocalDate getLocalDate(String dateStr, String fmt)
@@ -108,29 +221,19 @@ public class TimeUtil
 		return LocalDate.parse(dateStr, formatter);
 	}
 
+	public static LocalDate getLocalDate(ZonedDateTime zdt)
+	{
+		return getLocal(zdt).toLocalDate();
+	}
+
+	public static LocalDate getLocalDate(ZonedDateTime zdt, ZoneId zoneId)
+	{
+		return getLocal(zdt, zoneId).toLocalDate();
+	}
+
 	public static LocalDate getLocalDate(Date date)
 	{
 		return LocalDate.from(date.toInstant());
-	}
-
-	public static LocalDate getUTCLocalDateFromLocalDate(Date date)
-	{
-		return getZonedLocalDateFromLocalDate(date, ZoneId.of("UTC"));
-	}
-
-	public static LocalDate getUTCLocalDateFromZonedDate(Date date, ZoneId original)
-	{
-		return getZonedLocalDateFromZonedDate(date, original, ZoneId.of("UTC"));
-	}
-
-	public static LocalDate getZonedLocalDateFromLocalDate(Date date, ZoneId target)
-	{
-		return getZonedLocalDateFromZonedDate(date, ZoneId.systemDefault(), target);
-	}
-
-	public static LocalDate getZonedLocalDateFromZonedDate(Date date, ZoneId original, ZoneId target)
-	{
-		return getZonedFromZonedDate(date, original, target).toLocalDate();
 	}
 
 	public static boolean isBeforeEqual(ZonedDateTime zdt1, ZonedDateTime zdt2)

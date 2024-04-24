@@ -6,8 +6,11 @@ import com.eroelf.javaxsx.util.group.HashGetter;
 /**
  * The {@link HashGetter} sub-class which use md5 digest to generate hashes.
  * 
+ * @deprecated use {@link DigestHashGetter} instead.
+ * 
  * @author weikun.zhong
  */
+@Deprecated
 public class Md5HashGetter implements HashGetter
 {
 	private int bytes;

@@ -5,6 +5,20 @@ import java.util.function.Consumer;
 
 public class StdLoggers
 {
+	public static final BiConsumer<String, Throwable> STD_OUT_MSG_EXCEPTION_LOGGER=(msg, e) -> {
+		if(msg!=null)
+			System.out.println(msg);
+		if(e!=null)
+			e.printStackTrace(System.out);
+	};
+
+	public static final BiConsumer<String, Throwable> STD_ERR_MSG_EXCEPTION_LOGGER=(msg, e) -> {
+		if(msg!=null)
+			System.err.println(msg);
+		if(e!=null)
+			e.printStackTrace(System.err);
+	};
+
 	public static final BiConsumer<Throwable, String> STD_OUT_EXCEPTION_MSG_LOGGER=(e, msg) -> {
 		if(e!=null)
 			e.printStackTrace(System.out);

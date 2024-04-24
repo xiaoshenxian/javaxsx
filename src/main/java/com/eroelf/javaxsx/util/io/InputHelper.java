@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 
 /**
  * A helper class for converting files to {@link InputStream} or {@link BufferedReader}.
@@ -172,6 +173,9 @@ public class InputHelper
 		case "bzip2":
 		case "bz2":
 			return new BZip2CompressorInputStream(in);
+		case "zstd":
+		case "zst":
+			return new ZstdCompressorInputStream(in);
 		default:
 			return in;
 		}

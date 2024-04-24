@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +88,10 @@ public final class RequestUrl
 			URLConnection connection=getConnection(url, enc, queries, false, requestProperties, connectTimeout, readTimeout);
 			return connect(connection);
 		}
+		catch(URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
 		catch(IOException e)
 		{
 			throw new UncheckedIOException(e);
@@ -100,6 +104,10 @@ public final class RequestUrl
 		{
 			URLConnection connection=getConnection(url, enc, queries, true, requestProperties, connectTimeout, readTimeout);
 			return connect(connection);
+		}
+		catch(URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e);
 		}
 		catch(IOException e)
 		{
@@ -209,6 +217,10 @@ public final class RequestUrl
 			URLConnection connection=getConnection(url, enc, queries, false, requestProperties, connectTimeout, readTimeout);
 			return connectAskList(connection);
 		}
+		catch(URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
 		catch(IOException e)
 		{
 			throw new UncheckedIOException(e);
@@ -247,19 +259,23 @@ public final class RequestUrl
 			URLConnection connection=getConnection(url, enc, queries, true, requestProperties, connectTimeout, readTimeout);
 			return connectAskList(connection);
 		}
+		catch(URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
 		catch(IOException e)
 		{
 			throw new UncheckedIOException(e);
 		}
 	}
 
-	public static URLConnection getConnection(String url, String enc, Map<?, ?> queries, boolean usePost, Map<?, ?> requestProperties, int connectTimeout, int readTimeout) throws MalformedURLException, IOException
+	public static URLConnection getConnection(String url, String enc, Map<?, ?> queries, boolean usePost, Map<?, ?> requestProperties, int connectTimeout, int readTimeout) throws IOException, URISyntaxException
 	{
 		if(!usePost && queries!=null)
 		{
 			url=UrlUtil.composeUrl(enc, url, queries);
 		}
-		URLConnection connection=new URL(url).openConnection();
+		URLConnection connection=new URI(url).toURL().openConnection();
 		if(requestProperties!=null)
 		{
 			for(Entry<?, ?> entry : requestProperties.entrySet())

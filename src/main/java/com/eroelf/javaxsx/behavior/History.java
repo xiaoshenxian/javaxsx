@@ -1,6 +1,7 @@
 package com.eroelf.javaxsx.behavior;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Base class of all class which records some information related to a historical event.
@@ -9,9 +10,18 @@ import java.util.Date;
  */
 public class History implements Comparable<History>
 {
-	public Date actionTime;
+	public ZonedDateTime actionTime;
 
-	public final static String DATE_FORMAT="yyyyMMdd HH:mm:ss.SSS";
+	public final static String DATE_TIME_FORMAT="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	public final static DateTimeFormatter DATE_TIME_FORMATTER=DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
+	protected History()
+	{}
+
+	public History(ZonedDateTime actionTime)
+	{
+		this.actionTime=actionTime;
+	}
 
 	@Override
 	public int compareTo(History obj)

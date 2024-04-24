@@ -2,7 +2,10 @@ package com.eroelf.javaxsx.behavior;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import com.eroelf.javaxsx.util.gson.ZonedDateTimeTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -12,7 +15,11 @@ import com.google.gson.stream.JsonWriter;
 
 public final class Behaviors
 {
-	private static final Gson GSON=new GsonBuilder().setDateFormat(History.DATE_FORMAT).serializeSpecialFloatingPointValues().create();
+	private static final Gson GSON=new GsonBuilder()
+			.serializeSpecialFloatingPointValues()
+			.setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+			.registerTypeAdapter(ZonedDateTime.class, new ZonedDateTimeTypeAdapter("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", ZoneId.of("UTC")))
+			.create();
 
 	private static final TypeAdapter<Behavior> BEHAVIOR_ADAPTER=new TypeAdapter<Behavior>() {
 		@Override

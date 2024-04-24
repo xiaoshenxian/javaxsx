@@ -1,8 +1,9 @@
 package com.eroelf.javaxsx.behavior;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
+
+import com.eroelf.javaxsx.util.TimeUtil;
 
 /**
  * Base class of all behaviors.
@@ -15,9 +16,9 @@ public class Behavior extends History implements BehaviorInterface
 	protected Behavior()
 	{}
 
-	public Behavior(Date actionTime)
+	public Behavior(ZonedDateTime actionTime)
 	{
-		this.actionTime=actionTime;
+		super(actionTime);
 	}
 
 	public Behavior(String line)
@@ -27,7 +28,7 @@ public class Behavior extends History implements BehaviorInterface
 
 	protected StringBuilder attachTo(StringBuilder stringBuilder)
 	{
-		return stringBuilder.append(new SimpleDateFormat(DATE_FORMAT).format(actionTime));
+		return stringBuilder.append(TimeUtil.formatUTC(actionTime, DATE_TIME_FORMATTER));
 	}
 
 	@Override
@@ -41,11 +42,11 @@ public class Behavior extends History implements BehaviorInterface
 		int pos=line.indexOf("\t");
 		try
 		{
-			actionTime=new SimpleDateFormat(DATE_FORMAT).parse(line.substring(0, pos));
+			actionTime=TimeUtil.getUTC(line.substring(0, pos), DATE_TIME_FORMATTER);
 		}
-		catch(ParseException e)
+		catch(DateTimeParseException e)
 		{
-			throw new IllegalArgumentException(String.format("The first part of the line must be the actionTime with the format of '%s'", DATE_FORMAT), e);
+			throw new IllegalArgumentException(String.format("The first part of the line must be the actionTime with the format of '%s'", DATE_TIME_FORMAT), e);
 		}
 		return pos;
 	}

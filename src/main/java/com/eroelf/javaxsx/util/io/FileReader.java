@@ -3,6 +3,7 @@ package com.eroelf.javaxsx.util.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.stream.Stream;
 
@@ -98,6 +99,26 @@ public class FileReader
 	public <T> FileReader(InputHelper inputHelper, Class<T> desClass, String fileNameString, int bufferSize)
 	{
 		load(inputHelper, desClass, fileNameString, bufferSize);
+	}
+
+	public FileReader(InputStream in)
+	{
+		load(InputHelper.get(), in);
+	}
+
+	public FileReader(InputHelper inputHelper, InputStream in)
+	{
+		load(inputHelper, in);
+	}
+
+	public FileReader(InputStream in, int bufferSize)
+	{
+		load(InputHelper.get(), in, bufferSize);
+	}
+
+	public FileReader(InputHelper inputHelper, InputStream in, int bufferSize)
+	{
+		load(inputHelper, in, bufferSize);
 	}
 
 	public void load()
@@ -245,6 +266,44 @@ public class FileReader
 		{
 			close();
 			br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void load(InputStream in)
+	{
+		load(InputHelper.get(), in);
+	}
+
+	public void load(InputHelper inputHelper, InputStream in)
+	{
+		this.inputHelper=inputHelper;
+		try
+		{
+			close();
+			br=this.inputHelper.getBufferedReader(in);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void load(InputStream in, int bufferSize)
+	{
+		load(InputHelper.get(), in, bufferSize);
+	}
+
+	public void load(InputHelper inputHelper, InputStream in, int bufferSize)
+	{
+		this.inputHelper=inputHelper;
+		try
+		{
+			close();
+			br=this.inputHelper.getBufferedReader(in, bufferSize);
 		}
 		catch(IOException e)
 		{

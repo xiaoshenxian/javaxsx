@@ -10,7 +10,7 @@
 
 	<groupId>com.eroelf</groupId>
 	<artifactId>javaxsx</artifactId>
-	<version>0.1.2</version>
+	<version>0.20.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>javaxsx</name>
@@ -20,23 +20,25 @@
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<properties>
 		<gson.version>2.10</gson.version>
-		<guava.version>31.1-jre</guava.version>
-		<commons-codec.version>1.15</commons-codec.version>
+		<guava.version>33.1.0-jre</guava.version>
+		<commons-codec.version>1.16.0</commons-codec.version>
 		<commons-math3.version>3.6.1</commons-math3.version>
-		<commons-lang3.version>3.12.0</commons-lang3.version>
-		<commons-compress.version>1.22</commons-compress.version>
-		<httpclient.version>4.5.13</httpclient.version>
-		<httpclient5.version>5.2</httpclient5.version>
-		<geotools.version>20.5</geotools.version>
+		<commons-lang3.version>3.14.0</commons-lang3.version>
+		<commons-compress.version>1.26.0</commons-compress.version>
+		<zstd-jni.version>1.5.6-2</zstd-jni.version>
+		<httpclient.version>4.5.14</httpclient.version>
+		<httpclient5.version>5.3.1</httpclient5.version>
+		<geotools.version>31.0</geotools.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>20</java.version>
 	</properties>
 
 	<scm>
@@ -57,9 +59,9 @@
 
 	<repositories>
 		<repository>
-			<id>geomajas</id>
-			<name>geomajas</name>
-			<url>https://maven.geomajas.org/</url>
+			<id>OSGeo</id>
+			<name>OSGeo</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
 		</repository>
 	</repositories>
 
@@ -99,6 +101,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.github.luben</groupId>
+			<artifactId>zstd-jni</artifactId>
+			<version>${zstd-jni.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${httpclient.version}</version>
@@ -126,6 +134,11 @@
 			<artifactId>gt-api</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-referencing</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
 	</dependencies>
 
 	<distributionManagement>
@@ -147,7 +160,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.13.0</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -162,7 +175,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.3.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -176,10 +189,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.6.3</version>
 				<configuration>
-					<charset>UTF-8</charset>
-					<encoding>UTF-8</encoding>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<docencoding>${project.reporting.outputEncoding}</docencoding>
+					<charset>${project.reporting.outputEncoding}</charset>
+					<doclint>all,-missing</doclint>
 				</configuration>
 				<executions>
 					<execution>
@@ -194,17 +209,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.4.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
+				<version>3.0.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.6</version>
+				<version>3.2.4</version>
 				<executions>
 					<execution>
 						<id>sign-artifacts</id>

@@ -4,7 +4,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-import com.eroelf.javaxsx.util.NumBytes;
 import com.eroelf.javaxsx.util.NumBytes.Order;
 
 /**
@@ -35,7 +34,7 @@ public class UUIDs
 		{
 			md=MessageDigest.getInstance("SHA-1");
 		}
-		catch(NoSuchAlgorithmException nsae)
+		catch(NoSuchAlgorithmException e)
 		{
 			throw new InternalError("SHA-1 not supported");
 		}

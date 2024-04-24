@@ -3,6 +3,7 @@ package com.eroelf.javaxsx.util.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -107,6 +108,26 @@ public class FileIterator implements Iterator<String>
 		load(inputHelper, desClass, fileNameString, bufferSize);
 	}
 
+	public FileIterator(InputStream in)
+	{
+		load(in);
+	}
+
+	public FileIterator(InputHelper inputHelper, InputStream in)
+	{
+		load(inputHelper, in);
+	}
+
+	public FileIterator(InputStream in, int bufferSize)
+	{
+		load(in, bufferSize);
+	}
+
+	public FileIterator(InputHelper inputHelper, InputStream in, int bufferSize)
+	{
+		load(inputHelper, in, bufferSize);
+	}
+
 	public void load()
 	{
 		load(inputHelper==null ? InputHelper.get() : inputHelper);
@@ -156,7 +177,7 @@ public class FileIterator implements Iterator<String>
 		try
 		{
 			close();
-			br=inputHelper.getBufferedReader(file);
+			br=this.inputHelper.getBufferedReader(file);
 		}
 		catch(IOException e)
 		{
@@ -194,7 +215,7 @@ public class FileIterator implements Iterator<String>
 		try
 		{
 			close();
-			br=inputHelper.getBufferedReader(fileNameString);
+			br=this.inputHelper.getBufferedReader(fileNameString);
 		}
 		catch(IOException e)
 		{
@@ -232,7 +253,7 @@ public class FileIterator implements Iterator<String>
 		try
 		{
 			close();
-			br=inputHelper.getBufferedReader(desClass, fileNameString);
+			br=this.inputHelper.getBufferedReader(desClass, fileNameString);
 		}
 		catch(IOException e)
 		{
@@ -252,6 +273,44 @@ public class FileIterator implements Iterator<String>
 		{
 			close();
 			br=this.inputHelper.getBufferedReader(desClass, fileNameString, bufferSize);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void load(InputStream in)
+	{
+		load(inputHelper==null ? InputHelper.get() : inputHelper, in);
+	}
+
+	public void load(InputHelper inputHelper, InputStream in)
+	{
+		this.inputHelper=inputHelper;
+		try
+		{
+			close();
+			br=this.inputHelper.getBufferedReader(in);
+		}
+		catch(IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	public void load(InputStream in, int bufferSize)
+	{
+		load(inputHelper==null ? InputHelper.get() : inputHelper, in, bufferSize);
+	}
+
+	public void load(InputHelper inputHelper, InputStream in, int bufferSize)
+	{
+		this.inputHelper=inputHelper;
+		try
+		{
+			close();
+			br=this.inputHelper.getBufferedReader(in, bufferSize);
 		}
 		catch(IOException e)
 		{

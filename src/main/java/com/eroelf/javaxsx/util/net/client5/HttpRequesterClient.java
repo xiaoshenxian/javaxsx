@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.net.ssl.SSLContext;
 
@@ -68,11 +69,10 @@ public class HttpRequesterClient implements Closeable
 				.setDefaultSocketConfig(socketConfigBuilder.build())
 				.setDefaultConnectionConfig(connectionConfigBuilder.build());
 
+		SSLConnectionSocketFactoryBuilder socketFactoryBuilder=SSLConnectionSocketFactoryBuilder.create().setTlsVersions(TLS.V_1_3, TLS.V_1_2);
 		if(sslContext!=null)
-			builder.setSSLSocketFactory(SSLConnectionSocketFactoryBuilder.create()
-					.setSslContext(sslContext)
-					.setTlsVersions(TLS.V_1_3, TLS.V_1_2)
-					.build());
+			socketFactoryBuilder.setSslContext(sslContext);
+		builder.setSSLSocketFactory(socketFactoryBuilder.build());
 
 		return builder;
 	}
@@ -249,18 +249,21 @@ public class HttpRequesterClient implements Closeable
 
 	public <T> T sendGet(String uri, Map<String, Object> params, Map<String, Object> headers, HttpContext context, HttpClientResponseHandler<T> responseHandler) throws URISyntaxException, ClientProtocolException, IOException
 	{
-		HttpGet httpGet=new HttpGet(getUri(uri, params));
-		configHeaders(httpGet, headers);
-		return client.execute(httpGet, context, responseHandler);
+		return send(HttpGet::new, uri, params, null, headers, context, responseHandler);
 	}
 
 	public <T> T sendPost(String uri, Map<String, Object> params, HttpEntity httpEntity, Map<String, Object> headers, HttpContext context, HttpClientResponseHandler<T> responseHandler) throws URISyntaxException, ClientProtocolException, IOException
 	{
-		HttpPost httpPost=new HttpPost(getUri(uri, params));
-		configHeaders(httpPost, headers);
+		return send(HttpPost::new, uri, params, httpEntity, headers, context, responseHandler);
+	}
+
+	public <T> T send(Function<URI, HttpUriRequestBase> method, String uri, Map<String, Object> params, HttpEntity httpEntity, Map<String, Object> headers, HttpContext context, HttpClientResponseHandler<T> responseHandler) throws URISyntaxException, ClientProtocolException, IOException
+	{
+		HttpUriRequestBase request=method.apply(getUri(uri, params));
+		configHeaders(request, headers);
 		if(httpEntity!=null)
-			httpPost.setEntity(httpEntity);
-		return client.execute(httpPost, context, responseHandler);
+			request.setEntity(httpEntity);
+		return client.execute(request, context, responseHandler);
 	}
 
 	public static URI getUri(String uri, Map<String, Object> params) throws URISyntaxException

@@ -1,6 +1,6 @@
 package com.eroelf.javaxsx.behavior;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import com.eroelf.javaxsx.util.Strings;
 
@@ -17,7 +17,7 @@ public class UserBehavior extends Behavior
 	protected UserBehavior()
 	{}
 
-	public UserBehavior(Date actionTime, String identifier)
+	public UserBehavior(ZonedDateTime actionTime, String identifier)
 	{
 		super(actionTime);
 		this.identifier=identifier;

@@ -1,8 +1,10 @@
 package com.eroelf.javaxsx.behavior;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
@@ -18,21 +20,21 @@ public final class Histories
 	 * Trim the {@link History} list by deleting all elements that happened before baseTime-beforeTime and at or after baseTime+afterTime.
 	 * In other words, keep only the {@link History} objects happened within the interval: [baseTime-beforeTime, baseTime+afterTime).
 	 * The units of beforeTime and afterTime are defined by timeUnit.
-	 * If needSort is <tt>true</tt>, the list will be sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
+	 * If needSort is {@code true}, the list will be sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
 	 * 
 	 * @param list The list to be processing.
-	 * @param needSorting The list will be sorted first if this parameter is <tt>true</tt>. If this parameter is <tt>false</tt>, it would be the user's responsibility to guarantee that the list is sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
+	 * @param needSorting The list will be sorted first if this parameter is {@code true}. If this parameter is {@code false}, it would be the user's responsibility to guarantee that the list is sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
 	 * @param baseTime The base time for trim.
 	 * @param beforeTime Lower time span to the baseTime.
 	 * @param afterTime Upper time span to the baseTime.
 	 * @param timeUnit Define the units of both beforeTime and afterTime.
-	 * @return <tt>true</tt> if the list was trimmed, otherwise <tt>false</tt>.
+	 * @return {@code true} if the list was trimmed, otherwise {@code false}.
 	 */
-	public static boolean trimList(List<? extends History> list, boolean needSorting, Date baseTime, long beforeTime, long afterTime, TimeUnit timeUnit)
+	public static boolean trimList(List<? extends History> list, boolean needSorting, ZonedDateTime baseTime, long beforeTime, long afterTime, TimeUnit timeUnit)
 	{
-		long base=baseTime.getTime();
-		Date beforeDate=new Date(base-timeUnit.toMillis(beforeTime));
-		Date afterDate=new Date(base+timeUnit.toMillis(afterTime));
+		long base=baseTime.toInstant().toEpochMilli();
+		ZonedDateTime beforeDate=ZonedDateTime.ofInstant(Instant.ofEpochMilli(base-timeUnit.toMillis(beforeTime)), ZoneId.of("UTC"));
+		ZonedDateTime afterDate=ZonedDateTime.ofInstant(Instant.ofEpochMilli(base+timeUnit.toMillis(afterTime)), ZoneId.of("UTC"));
 		return trimList(list, needSorting, beforeDate, afterDate);
 	}
 
@@ -42,12 +44,12 @@ public final class Histories
 	 * The list will be sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
 	 * 
 	 * @param list The list to be processing.
-	 * @param needSorting The list will be sorted first if this parameter is <tt>true</tt>. If this parameter is <tt>false</tt>, it would be the user's responsibility to guarantee that the list is sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
+	 * @param needSorting The list will be sorted first if this parameter is {@code true}. If this parameter is {@code false}, it would be the user's responsibility to guarantee that the list is sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
 	 * @param beforeDate The lower bound of the retained interval (inclusive).
 	 * @param afterDate The upper bound of the retained interval (exclusive).
-	 * @return <tt>true</tt> if the list was trimmed, otherwise <tt>false</tt>.
+	 * @return {@code true} if the list was trimmed, otherwise {@code false}.
 	 */
-	public static boolean trimList(List<? extends History> list, boolean needSorting, Date beforeDate, Date afterDate)
+	public static boolean trimList(List<? extends History> list, boolean needSorting, ZonedDateTime beforeDate, ZonedDateTime afterDate)
 	{
 		if(list!=null && !list.isEmpty())
 		{
@@ -86,6 +88,30 @@ public final class Histories
 	 * @return The combined list sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}, or {@code null} if both l1 and l2 are {@code null}.
 	 */
 	public static List<? extends History> combineLists(List<? extends History> l1, List<? extends History> l2)
+	{
+		if(l1==null && l2==null)
+			return null;
+
+		List<History> list=new ArrayList<>();
+		if(l1!=null)
+			list.addAll(l1);
+		if(l2!=null)
+			list.addAll(l2);
+		Collections.sort(list);
+
+		return list;
+	}
+
+	/**
+	 * Combine two {@link History} lists into one, with the combined list sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}.
+	 * 
+	 * Remove duplicates.
+	 * 
+	 * @param l1 One list to be combining.
+	 * @param l2 The other list to be combining.
+	 * @return The combined list sorted into ascending order, according to the {@link History}'s {@linkplain History natural ordering}, or {@code null} if both l1 and l2 are {@code null}.
+	 */
+	public static List<? extends History> combineListsUnique(List<? extends History> l1, List<? extends History> l2)
 	{
 		if(l1!=null && l2!=null)
 		{

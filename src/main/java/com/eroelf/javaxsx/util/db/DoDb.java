@@ -1,5 +1,6 @@
 package com.eroelf.javaxsx.util.db;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -19,6 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.eroelf.javaxsx.util.StdLoggers;
@@ -365,12 +367,17 @@ public class DoDb implements AutoCloseable
 		}
 	}
 
-	public void close() throws SQLException
+	public void closeAllStatements() throws SQLException
 	{
 		closePreparedStatement();
 		closeStatement();
 		closePreStatList();
 		closeStatList();
+	}
+
+	public void close() throws SQLException
+	{
+		closeAllStatements();
 
 		if(connection!=null)
 		{
@@ -534,6 +541,19 @@ public class DoDb implements AutoCloseable
 					private int[] methodIdx;
 
 					private boolean nextFlag=false;
+					
+					private Constructor<T> clazzConstructor;
+
+					{
+						try
+						{
+							clazzConstructor=clazz.getConstructor();
+						}
+						catch(Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
 
 					@Override
 					public boolean hasNext()
@@ -570,7 +590,7 @@ public class DoDb implements AutoCloseable
 								}
 								else
 								{
-									T obj=clazz.newInstance();
+									T obj=clazzConstructor.newInstance();
 									Map<Integer, Field> fieldsMap=new HashMap<>();
 									Map<Integer, Method> methodsMap=new HashMap<>();
 									assignMethodsMap=new HashMap<>();
@@ -621,7 +641,7 @@ public class DoDb implements AutoCloseable
 											Class<?> fieldClass=field.getType();
 											try
 											{
-												if(fieldClass.isAssignableFrom(objectClass))
+												if(fieldClass.isAssignableFrom(objectClass) || (ClassUtils.isPrimitiveWrapper(fieldClass) && ClassUtils.wrapperToPrimitive(fieldClass).isAssignableFrom(objectClass)) || (ClassUtils.isPrimitiveWrapper(objectClass) && fieldClass.isAssignableFrom(ClassUtils.wrapperToPrimitive(objectClass))))
 													field.set(obj, fieldObject);
 												else
 													throw new IllegalArgumentException(String.format("resultSetIter::The destination class [%s] is not assignable from the database class [%s]!", fieldClass.getName(), objectClass.getName()));
@@ -714,7 +734,7 @@ public class DoDb implements AutoCloseable
 									return (T)resultSet.getObject(1);
 								else
 								{
-									T obj=clazz.newInstance();
+									T obj=clazzConstructor.newInstance();
 									for(int i=0; i<fields.length; i++)
 									{
 										fields[i].set(obj, resultSet.getObject(fieldIdx[i]));

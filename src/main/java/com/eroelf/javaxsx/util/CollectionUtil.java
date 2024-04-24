@@ -320,11 +320,11 @@ public final class CollectionUtil
 	 * @param map the root map.
 	 * @param value value to be associated with the specified keys.
 	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
-	 * @return the previous value associated with <tt>keys</tt>, or
-     *         <tt>null</tt> if there was no mapping for <tt>keys</tt>.
-     *         (A <tt>null</tt> return can also indicate that the map
-     *         previously associated <tt>null</tt> with <tt>keys</tt>,
-     *         if the implementation supports <tt>null</tt> values.)
+	 * @return the previous value associated with {@code keys}, or
+     *         {@code null} if there was no mapping for {@code keys}.
+     *         (A {@code null} return can also indicate that the map
+     *         previously associated {@code null} with {@code keys},
+     *         if the implementation supports {@code null} values.)
      * @throws IllegalArgumentException if any element associate to any key is not a map.
 	 * @see #nestedPut(Object, Object, Supplier, Object...)
 	 */
@@ -340,11 +340,11 @@ public final class CollectionUtil
 	 * @param value value to be associated with the specified keys.
 	 * @param mapGen the map generator to create new maps.
 	 * @param keys the keys which are supposed to be contained by the {@code map} in a nested form according to the {@code keys}' order.
-	 * @return the previous value associated with <tt>keys</tt>, or
-     *         <tt>null</tt> if there was no mapping for <tt>keys</tt>.
-     *         (A <tt>null</tt> return can also indicate that the map
-     *         previously associated <tt>null</tt> with <tt>keys</tt>,
-     *         if the implementation supports <tt>null</tt> values.)
+	 * @return the previous value associated with {@code keys}, or
+     *         {@code null} if there was no mapping for {@code keys}.
+     *         (A {@code null} return can also indicate that the map
+     *         previously associated {@code null} with {@code keys},
+     *         if the implementation supports {@code null} values.)
      * @throws IllegalArgumentException if any element associate to any key is not a map.
 	 */
 	@SuppressWarnings("unchecked")

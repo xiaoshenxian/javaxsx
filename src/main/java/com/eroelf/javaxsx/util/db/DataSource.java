@@ -1,5 +1,6 @@
 package com.eroelf.javaxsx.util.db;
 
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.eroelf.javaxsx.util.StdLoggers;
+
 /**
  * Database data source with connection pool. 
  * 
@@ -19,108 +22,108 @@ public class DataSource
 {
 	public class Conn
 	{
-		public final DoDb doDb;
+		public final TimedDoDb timedDoDb;
 		public final Consumer<String> logger;
 
 		public Conn() throws InterruptedException
 		{
-			doDb=DataSource.this.take();
-			logger=s -> loggerFunc.accept(null, s);
+			timedDoDb=DataSource.this.take();
+			logger=s -> loggerFunc.accept(s, null);
 		}
 
-		public void release() throws InterruptedException
+		public void release() throws SQLException, InterruptedException
 		{
-			DataSource.this.put(doDb);
+			DataSource.this.put(timedDoDb);
 		}
 
 		public ResultSet executeQuery(boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.executeQuery(ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.executeQuery(ifOnceForAllData, querySql, objects);
 		}
 
 		public ResultSet executeNewQuery(boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.executeNewQuery(ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.executeNewQuery(ifOnceForAllData, querySql, objects);
 		}
 
 		public int executeUpdate(String updateSql, Object... objects) throws SQLException
 		{
-			return doDb.executeUpdate(false, updateSql, objects);
+			return timedDoDb.doDb.executeUpdate(false, updateSql, objects);
 		}
 
 		public int executeNewUpdate(String updateSql, Object... objects) throws SQLException
 		{
-			return doDb.executeNewUpdate(updateSql, objects);
+			return timedDoDb.doDb.executeNewUpdate(updateSql, objects);
 		}
 
 		public void prepareStatement(boolean ifOnceForAllData, String sql) throws SQLException
 		{
-			doDb.prepareStatement(ifOnceForAllData, sql);
+			timedDoDb.doDb.prepareStatement(ifOnceForAllData, sql);
 		}
 
 		public PreparedStatement newPrepareStatement(boolean ifOnceForAllData, String sql) throws SQLException
 		{
-			return doDb.newPrepareStatement(ifOnceForAllData, sql);
+			return timedDoDb.doDb.newPrepareStatement(ifOnceForAllData, sql);
 		}
 
 		public ResultSet executeQueryAgain(Object... objects) throws SQLException
 		{
-			return doDb.executeQueryAgain(objects);
+			return timedDoDb.doDb.executeQueryAgain(objects);
 		}
 
 		public int executeUpdateAgain(Object... objects) throws SQLException
 		{
-			return doDb.executeUpdateAgain(false, objects);
+			return timedDoDb.doDb.executeUpdateAgain(false, objects);
 		}
 
 		public ResultSet executeStatementQuery(boolean ifOnceForAllData, String querySql) throws SQLException
 		{
-			return doDb.executeStatementQuery(ifOnceForAllData, querySql);
+			return timedDoDb.doDb.executeStatementQuery(ifOnceForAllData, querySql);
 		}
 
 		public ResultSet executeNewStatementQuery(boolean ifOnceForAllData, String querySql) throws SQLException
 		{
-			return doDb.executeNewStatementQuery(ifOnceForAllData, querySql);
+			return timedDoDb.doDb.executeNewStatementQuery(ifOnceForAllData, querySql);
 		}
 
 		public int executeStatementUpdate(String updateSql) throws SQLException
 		{
-			return doDb.executeStatementUpdate(false, updateSql);
+			return timedDoDb.doDb.executeStatementUpdate(false, updateSql);
 		}
 
 		public int executeNewStatementUpdate(String updateSql) throws SQLException
 		{
-			return doDb.executeNewStatementUpdate(updateSql);
+			return timedDoDb.doDb.executeNewStatementUpdate(updateSql);
 		}
 
 		public void addBatch(Object... objects) throws SQLException
 		{
-			doDb.addBatch(objects);
+			timedDoDb.doDb.addBatch(objects);
 		}
 
 		public int[] executeBatch() throws SQLException
 		{
-			return doDb.executeBatch();
+			return timedDoDb.doDb.executeBatch();
 		}
 
 		public boolean getAutoCommit() throws SQLException
 		{
-			return doDb.getAutoCommit();
+			return timedDoDb.doDb.getAutoCommit();
 		}
 
 		public void setAutoCommit(boolean autoCommit) throws SQLException
 		{
-			doDb.setAutoCommit(autoCommit);
+			timedDoDb.doDb.setAutoCommit(autoCommit);
 		}
 
 		public void commit() throws SQLException
 		{
-			doDb.commit(false);
+			timedDoDb.doDb.commit(false);
 		}
 
 		public void rollback() throws SQLException
 		{
-			doDb.rollback(false);
+			timedDoDb.doDb.rollback(false);
 		}
 
 		public void executeTransaction(Consumer<Conn> transaction) throws SQLException
@@ -142,10 +145,7 @@ public class DataSource
 			{
 				try
 				{
-					doDb.closePreparedStatement();
-					doDb.closeStatement();
-					doDb.closePreStatList();
-					doDb.closeStatList();
+					timedDoDb.doDb.closeAllStatements();
 				}
 				finally
 				{
@@ -157,60 +157,92 @@ public class DataSource
 
 		public String preparedStatementToString()
 		{
-			return doDb.preparedStatementToString();
+			return timedDoDb.doDb.preparedStatementToString();
 		}
 
 		public String statementToString()
 		{
-			return doDb.statementToString();
+			return timedDoDb.doDb.statementToString();
 		}
 
 		public <T> List<T> fromQuery(Class<T> clazz, boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.fromQuery(logger, clazz, false, ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.fromQuery(logger, clazz, false, ifOnceForAllData, querySql, objects);
 		}
 
 		public <T> List<T> fromNewQuery(Class<T> clazz, boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.fromNewQuery(logger, clazz, ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.fromNewQuery(logger, clazz, ifOnceForAllData, querySql, objects);
 		}
 
 		public <T> Iterable<T> queryIter(Class<T> clazz, boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.queryIter(logger, clazz, ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.queryIter(logger, clazz, ifOnceForAllData, querySql, objects);
 		}
 
 		public <T> Iterable<T> newQueryIter(Class<T> clazz, boolean ifOnceForAllData, String querySql, Object... objects) throws SQLException
 		{
-			return doDb.newQueryIter(logger, clazz, ifOnceForAllData, querySql, objects);
+			return timedDoDb.doDb.newQueryIter(logger, clazz, ifOnceForAllData, querySql, objects);
 		}
 
 		public <T> List<T> fromResultSet(Class<T> clazz) throws SQLException
 		{
-			return doDb.fromResultSet(logger, clazz, false);
+			return timedDoDb.doDb.fromResultSet(logger, clazz, false);
 		}
 
 		public <T> Iterable<T> resultSetIter(Class<T> clazz)
 		{
-			return doDb.resultSetIter(logger, clazz);
+			return timedDoDb.doDb.resultSetIter(logger, clazz);
 		}
 	}
 
-	private LinkedBlockingQueue<DoDb> pool;
+	private static class TimedDoDb
+	{
+		public final DoDb doDb;
+		public long lastUseTimestamp;
+
+		public TimedDoDb(DoDb doDb)
+		{
+			this.doDb=doDb;
+			this.lastUseTimestamp=System.currentTimeMillis();
+		}
+	}
+
+	private static final int DEFAULT_RECONNECT_SEC=28800;
+
+	private LinkedBlockingQueue<TimedDoDb> pool;
 	private int size;
 	private String url;
 	private String user;
 	private String pwd;
-	private BiConsumer<Throwable, String> loggerFunc;
+	private long reconnectMilliSec;
+	private BiConsumer<String, Throwable> loggerFunc;
 
 	private boolean initialized;
 
-	public DataSource(int size, String url, String user, String pwd, BiConsumer<Throwable, String> logger)
+	public DataSource(int size, String url, String user, String pwd)
 	{
+		this(size, url, user, pwd, DEFAULT_RECONNECT_SEC, StdLoggers.STD_ERR_MSG_EXCEPTION_LOGGER);
+	}
+
+	public DataSource(int size, String url, String user, String pwd, int reconnectSec)
+	{
+		this(size, url, user, pwd, reconnectSec, StdLoggers.STD_ERR_MSG_EXCEPTION_LOGGER);
+	}
+
+	public DataSource(int size, String url, String user, String pwd, BiConsumer<String, Throwable> logger)
+	{
+		this(size, url, user, pwd, DEFAULT_RECONNECT_SEC, logger);
+	}
+
+	public DataSource(int size, String url, String user, String pwd, int reconnectSec, BiConsumer<String, Throwable> logger)
+	{
+		this.pool=new LinkedBlockingQueue<>(size);
 		this.size=size;
 		this.url=url;
 		this.user=user;
 		this.pwd=pwd;
+		this.reconnectMilliSec=reconnectSec*1000;
 		this.loggerFunc=logger;
 
 		initialized=false;
@@ -222,34 +254,39 @@ public class DataSource
 			throw new SQLException("Not all old connection closed!");
 		for(int i=0; i<size; i++)
 		{
-			put(new DoDb(DriverManager.getConnection(url, user, pwd)));
+			put(new TimedDoDb(new DoDb(newConnection())));
 		}
 		initialized=true;
 	}
 
 	public int close() throws InterruptedException
 	{
-		initialized=false;
-		if(size>0)
+		if(initialized)
 		{
-			int closed=0;
-			for(int i=0; i<size; i++)
+			initialized=false;
+			if(size>0)
 			{
-				DoDb doDb=take();
-				try
+				int closed=0;
+				for(int i=0; i<size; i++)
 				{
-					doDb.close();
-					++closed;
+					TimedDoDb timedDoDb=pool.take();
+					try
+					{
+						timedDoDb.doDb.close();
+						++closed;
+					}
+					catch(Exception e)
+					{
+						loggerFunc.accept("Close failed on connection "+i, e);
+						pool.put(timedDoDb);
+					}
 				}
-				catch(Exception e)
-				{
-					loggerFunc.accept(e, "Close failed on connection "+i);
-					pool.put(doDb);
-				}
+				size=size-closed;
 			}
-			size=size-closed;
+			return size;
 		}
-		return size;
+		else
+			return 0;
 	}
 
 	public Conn takeConn() throws InterruptedException
@@ -268,7 +305,7 @@ public class DataSource
 		{
 			try
 			{
-				conn.doDb.closePreparedStatement();
+				conn.timedDoDb.doDb.closePreparedStatement();
 			}
 			finally
 			{
@@ -288,7 +325,7 @@ public class DataSource
 		{
 			try
 			{
-				conn.doDb.closePreparedStatement();
+				conn.timedDoDb.doDb.closePreparedStatement();
 			}
 			finally
 			{
@@ -308,7 +345,7 @@ public class DataSource
 		{
 			try
 			{
-				conn.doDb.closeStatement();
+				conn.timedDoDb.doDb.closeStatement();
 			}
 			finally
 			{
@@ -328,7 +365,7 @@ public class DataSource
 		{
 			try
 			{
-				conn.doDb.closeStatement();
+				conn.timedDoDb.doDb.closeStatement();
 			}
 			finally
 			{
@@ -361,7 +398,7 @@ public class DataSource
 		{
 			try
 			{
-				conn.doDb.closePreparedStatement();
+				conn.timedDoDb.doDb.closePreparedStatement();
 			}
 			finally
 			{
@@ -370,16 +407,43 @@ public class DataSource
 		}
 	}
 
-	protected DoDb take() throws InterruptedException
+	protected TimedDoDb take() throws InterruptedException
 	{
 		if(initialized)
-			return pool.take();
+		{
+			TimedDoDb timedDoDb=pool.take();
+			testReconnect(timedDoDb);
+			return timedDoDb;
+		}
 		else
 			throw new InterruptedException("This data source has been closed!");
 	}
 
-	protected void put(DoDb doDb) throws InterruptedException
+	protected void put(TimedDoDb timedDoDb) throws InterruptedException
 	{
-		pool.put(doDb);
+		pool.put(timedDoDb);
+	}
+
+	protected void testReconnect(TimedDoDb timedDoDb) throws InterruptedException
+	{
+		long now=System.currentTimeMillis();
+		if(now-timedDoDb.lastUseTimestamp>=reconnectMilliSec)
+		{
+			try
+			{
+				timedDoDb.doDb.close();
+				timedDoDb.doDb.setConnection(newConnection());
+				timedDoDb.lastUseTimestamp=now;
+			}
+			catch(SQLException e)
+			{
+				loggerFunc.accept(null, e);
+			}
+		}
+	}
+
+	protected Connection newConnection() throws SQLException
+	{
+		return DriverManager.getConnection(url, user, pwd);
 	}
 }

@@ -11,6 +11,8 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
+import org.apache.commons.compress.compressors.zstandard.ZstdCompressorOutputStream;
 
 /**
  * Provide methods to compress and decompress data by specified compression algorithms.
@@ -71,6 +73,10 @@ public class Compressor
 			case "bz2":
 				inCompressorFactory=BZip2CompressorInputStream::new;
 				outCompressorFactory=BZip2CompressorOutputStream::new;
+			case "zstd":
+			case "zst":
+				inCompressorFactory=ZstdCompressorInputStream::new;
+				outCompressorFactory=ZstdCompressorOutputStream::new;
 				break;
 			default:
 				throw new IllegalArgumentException("Unsupported compression type: "+compressionType);
